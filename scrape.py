@@ -164,5 +164,5 @@ for album in albums:
             f.write(lyrics)
         
         print(f"      -> Fichier enregistré : {file_path}")
-        time.sleep(0.1)  # Pause entre les titres
+        time.sleep(0.01)  # Pause entre les titres
     time.sleep(0.1)  # Pause entre les albums
