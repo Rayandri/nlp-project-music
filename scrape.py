@@ -178,7 +178,7 @@ for album in albums:
     artist = album["artist"]
     album_title = album["album"]
     
-    print(f"Recherche de l'album '{album_title}' de {artist}...")
+    # print(f"Recherche de l'album '{album_title}' de {artist}...")
     album_info = search_album_mb(artist, album_title)
     if album_info is None:
         print(f"  -> Album introuvable pour {artist} - {album_title}.")
@@ -198,7 +198,7 @@ for album in albums:
     if not track_list:
         print("  -> Aucun titre trouvé pour cet album.")
         continue
-    print(f"  -> {len(track_list)} titre(s) trouvé(s).")
+    # print(f"  -> {len(track_list)} titre(s) trouvé(s).")
     
     for track in track_list:
         # print(f"    Traitement du titre : {track}")
