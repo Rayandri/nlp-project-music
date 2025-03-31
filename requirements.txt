@@ -1,2 +1,5 @@
 requests
 nltk
+scikit-learn
+gensim
+sentence-transformers
