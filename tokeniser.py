@@ -39,12 +39,9 @@ def tokenize_text(text):
                 tokens.append(word)
     return tokens
 
-# Dossier source contenant les fichiers de paroles
 input_root = "lyrics_dataset"
-# Dossier de sortie pour les textes tokenisés
 output_root = "tokenized_lyrics_dataset"
 
-# Parcours récursif du dossier source
 for root, dirs, files in os.walk(input_root):
     for file in files:
         if file.endswith(".txt"):
@@ -53,10 +50,8 @@ for root, dirs, files in os.walk(input_root):
                 text = f.read()
             
             tokens = tokenize_text(text)
-            # On reconstruit le texte tokenisé sous forme de chaîne (les tokens séparés par des espaces)
             tokenized_text = " ".join(tokens)
             
-            # Conserver la même structure de dossiers dans le dossier de sortie
             relative_path = os.path.relpath(root, input_root)
             output_dir = os.path.join(output_root, relative_path)
             os.makedirs(output_dir, exist_ok=True)

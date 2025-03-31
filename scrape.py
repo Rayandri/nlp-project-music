@@ -3,11 +3,9 @@ import re
 import time
 import requests
 
-# Fonction pour nettoyer les noms de fichiers et dossiers
 def sanitize_filename(name):
     return re.sub(r'[\\/*?:"<>|]', "", name)
 
-# Détermine la tranche d'années en fonction d'une année donnée
 def get_year_range(year):
     try:
         year = int(year)
@@ -25,9 +23,7 @@ def get_year_range(year):
         return "2026-2100"
     return "Autre"
 
-# Recherche d’un album via l’API MusicBrainz
 def search_album_mb(artist, album):
-    # Construction de la requête de recherche
     query = f'release:"{album}" AND artist:"{artist}"'
     url = "http://musicbrainz.org/ws/2/release/"
     headers = {
@@ -46,10 +42,8 @@ def search_album_mb(artist, album):
     releases = data.get("releases", [])
     if not releases:
         return None
-    # On choisit le premier résultat
     return releases[0]
 
-# Récupère la liste des pistes et d'autres infos via l’API MusicBrainz (avec inc=recordings)
 def get_album_tracks_mb(mbid):
     url = f"http://musicbrainz.org/ws/2/release/{mbid}"
     headers = {
@@ -65,23 +59,19 @@ def get_album_tracks_mb(mbid):
         return None
     data = response.json()
     tracks = []
-    # Les pistes sont regroupées dans la liste "media"
     for medium in data.get("media", []):
         for track in medium.get("tracks", []):
             tracks.append(track.get("title"))
     return tracks
 
-# Récupère les paroles d'un morceau via l’API Lyrics.ovh
 def get_track_lyrics(artist, track):
     url = f"https://api.lyrics.ovh/v1/{artist}/{track}"
     response = requests.get(url)
     if response.status_code != 200:
-        # Pas de paroles trouvées ou autre erreur
         return None
     data = response.json()
     return data.get("lyrics", None)
 
-# Liste d'albums à traiter (à adapter)
 albums = [
     {"genre": "Rap", "artist": "Booba", "album": "Ouest Side"},
     {"genre": "Rap", "artist": "PNL", "album": "Le Monde Chico"},
@@ -181,7 +171,6 @@ albums = [
 ]
 
 
-# Dossier racine pour l'enregistrement
 root_dir = "lyrics_dataset"
 
 for album in albums:
@@ -218,12 +207,10 @@ for album in albums:
             print(f"      -> Paroles non trouvées pour {track}, {artist}.")
             continue
         
-        # Création du nom de fichier
         file_name = sanitize_filename(track) + ".txt"
         file_path = os.path.join(album_folder, file_name)
         
-        # Écriture du fichier avec les métadonnées en en-tête
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(lyrics)
-        time.sleep(0.0001)  # Pause entre les titres
-    time.sleep(0.0001)  # Pause entre les albums
+        time.sleep(0.0001)
+    time.sleep(0.0001)
