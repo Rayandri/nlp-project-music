@@ -19,8 +19,11 @@ def get_year_range(year):
         return "2010-2019"
     elif 2020 <= year <= 2025:
         return "2020-2025"
-    else:
-        return "Autres"
+    elif year < 2000 and year > 1900:
+        return "1900-1999"
+    elif year > 2025:
+        return "2026-2100"
+    return "Autre"
 
 # Recherche d’un album via l’API MusicBrainz
 def search_album_mb(artist, album):
@@ -109,7 +112,72 @@ albums = [
     {"genre": "Chanson française", "artist": "Jacques Brel", "album": "Amsterdam"},
     {"genre": "Chanson française", "artist": "Charles Aznavour", "album": "La Bohème"},
     {"genre": "Chanson française", "artist": "Francis Cabrel", "album": "Samedi soir sur la terre"},
-    {"genre": "Chanson française", "artist": "Zazie", "album": "Zen"}
+    {"genre": "Chanson française", "artist": "Zazie", "album": "Zen"},
+    {"genre": "Rap", "artist": "IAM", "album": "L’école du micro d’argent"},
+    {"genre": "Rap", "artist": "NTM", "album": "Suprême NTM"},
+    {"genre": "Rap", "artist": "Soprano", "album": "Cosmopolitanie"},
+    {"genre": "Rap", "artist": "Vald", "album": "Agartha"},
+    {"genre": "Rap", "artist": "Niska", "album": "Commando"},
+    {"genre": "Rap", "artist": "Ninho", "album": "Destin"},
+    {"genre": "Rap", "artist": "Rohff", "album": "La fierté des nôtres"},
+    {"genre": "Rap", "artist": "Lefa", "album": "Fame"},
+    {"genre": "Rap", "artist": "Alkpote", "album": "Les Marches de l’Empereur"},
+    {"genre": "Rap", "artist": "Dinos", "album": "Stamina"},
+    {"genre": "Rap", "artist": "PLK", "album": "Enna"},
+    {"genre": "Rap", "artist": "ZKR", "album": "Dans les mains"},
+    {"genre": "Rap", "artist": "Kalash Criminel", "album": "Sélection naturelle"},
+    {"genre": "Rap", "artist": "Kery James", "album": "Mouhammad Alix"},
+    {"genre": "Rap", "artist": "Youssoupha", "album": "NGRTD"},
+    {"genre": "Rap", "artist": "Disiz", "album": "Pacifique"},
+    {"genre": "Rap", "artist": "Mister You", "album": "Dans ma grotte"},
+    {"genre": "Rap", "artist": "Heuss L’enfoiré", "album": "En esprit"},
+    {"genre": "Rap", "artist": "Hatik", "album": "Vague à l’âme"},
+    {"genre": "Rap", "artist": "Chilla", "album": "MŪN"},
+    {"genre": "Rap", "artist": "Dua Lipa", "album": "Future Nostalgia"},
+    {"genre": "Rap", "artist": "Damso", "album": "Lithopédion"},
+    {"genre": "Rap", "artist": "Niro", "album": "Les autres c'est nous"},
+    {"genre": "Rap", "artist": "Sofiane", "album": "Affranchis"},
+    {"genre": "Rap", "artist": "Kool Shen", "album": "Sur le fil"},
+    {"genre": "Rap", "artist": "Sexion d'Assaut", "album": "L'Apogée"},
+    {"genre": "Rap", "artist": "Lino", "album": "Psycho-Mélancolie"},
+    {"genre": "Rap", "artist": "Oxmo Puccino", "album": "Lipopette Bar"},
+    {"genre": "Rap", "artist": "Fianso", "album": "#JeSuisPasséChezSo"},
+    {"genre": "Rap", "artist": "Niro", "album": "#CoupDePression"},
+    {"genre": "Chanson française", "artist": "Georges Brassens", "album": "Les Copains d’abord"},
+    {"genre": "Chanson française", "artist": "Serge Gainsbourg", "album": "Histoire de Melody Nelson"},
+    {"genre": "Chanson française", "artist": "Barbara", "album": "L’aigle noir"},
+    {"genre": "Chanson française", "artist": "Michel Sardou", "album": "La maladie d’amour"},
+    {"genre": "Chanson française", "artist": "Maxime Le Forestier", "album": "Mon frère"},
+    {"genre": "Chanson française", "artist": "Alain Bashung", "album": "Osez Joséphine"},
+    {"genre": "Chanson française", "artist": "Julien Clerc", "album": "Fou, peut-être"},
+    {"genre": "Chanson française", "artist": "Renaud", "album": "Mistral gagnant"},
+    {"genre": "Chanson française", "artist": "Léo Ferré", "album": "Amour Anarchie"},
+    {"genre": "Chanson française", "artist": "Jean-Jacques Goldman", "album": "Positif"},
+    {"genre": "Chanson française", "artist": "Michel Delpech", "album": "Wight Is Wight"},
+    {"genre": "Chanson française", "artist": "Patrick Bruel", "album": "Alors regarde"},
+    {"genre": "Chanson française", "artist": "Florent Pagny", "album": "Savoir aimer"},
+    {"genre": "Chanson française", "artist": "Calogero", "album": "3"},
+    {"genre": "Chanson française", "artist": "Michel Berger", "album": "Beauséjour"},
+    {"genre": "Rock français", "artist": "Matmatah", "album": "La Ouache"},
+    {"genre": "Rock français", "artist": "Saez", "album": "Jours étranges"},
+    {"genre": "Rock français", "artist": "Luke", "album": "La tête en arrière"},
+    {"genre": "Rock français", "artist": "No One Is Innocent", "album": "Revolution.com"},
+    {"genre": "Rock français", "artist": "Dionysos", "album": "Western sous la neige"},
+    {"genre": "Rock français", "artist": "Shaka Ponk", "album": "The Geeks and the Jerkin' Socks"},
+    {"genre": "Rock français", "artist": "Astonvilla", "album": "Live"},
+    {"genre": "Rock français", "artist": "Eiffel", "album": "Le quart d’heure des ahuris"},
+    {"genre": "Rock français", "artist": "Kaolin", "album": "De retour dans nos criques"},
+    {"genre": "Rock français", "artist": "Zazie", "album": "Rodéo"},
+    {"genre": "Musique française", "artist": "Baloji", "album": "137 Avenue Kaniama"},
+    {"genre": "Musique française", "artist": "Lara Fabian", "album": "Nue"},
+    {"genre": "Musique française", "artist": "Pierre Lapointe", "album": "La science du cœur"},
+    {"genre": "Musique française", "artist": "Cœur de pirate", "album": "Roses"},
+    {"genre": "Musique française", "artist": "Salvatore Adamo", "album": "Mes chansons italiennes"},
+    {"genre": "Musique française", "artist": "Safia Nolin", "album": "Limoilou"},
+    {"genre": "Musique française", "artist": "Jean Leloup", "album": "Le Dôme"},
+    {"genre": "Musique française", "artist": "Daniel Bélanger", "album": "Rêver mieux"},
+    {"genre": "Musique française", "artist": "Dumas", "album": "Nord"},
+    {"genre": "Musique française", "artist": "Ariane Moffatt", "album": "22h22"}
 ]
 
 
@@ -144,10 +212,10 @@ for album in albums:
     print(f"  -> {len(track_list)} titre(s) trouvé(s).")
     
     for track in track_list:
-        print(f"    Traitement du titre : {track}")
+        # print(f"    Traitement du titre : {track}")
         lyrics = get_track_lyrics(artist, track)
         if not lyrics:
-            print("      -> Paroles non trouvées pour ce titre.")
+            print(f"      -> Paroles non trouvées pour {track}, {artist}.")
             continue
         
         # Création du nom de fichier
@@ -156,13 +224,6 @@ for album in albums:
         
         # Écriture du fichier avec les métadonnées en en-tête
         with open(file_path, "w", encoding="utf-8") as f:
-            f.write(f"Année : {release_year}\n")
-            f.write(f"Album : {album_title}\n")
-            f.write(f"Titre : {track}\n")
-            f.write(f"Artiste : {artist}\n")
-            f.write("\n")
             f.write(lyrics)
-        
-        print(f"      -> Fichier enregistré : {file_path}")
-        time.sleep(0.01)  # Pause entre les titres
-    time.sleep(0.1)  # Pause entre les albums
+        time.sleep(0.0001)  # Pause entre les titres
+    time.sleep(0.0001)  # Pause entre les albums
