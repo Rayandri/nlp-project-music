@@ -2,8 +2,6 @@ import os
 import re
 import time
 import requests
-from bs4 import BeautifulSoup
-import lyricsgenius
 
 # Fonction pour nettoyer les noms de fichiers et dossiers
 def sanitize_filename(name):
@@ -24,100 +22,63 @@ def get_year_range(year):
     else:
         return "Autres"
 
-# Construit l'URL d'un album sur Genius
-# Remarque : la structure attendue est "https://genius.com/albums/Artiste/Album"
-def build_album_url(artist, album):
-    artist_url = sanitize_filename(artist).replace(" ", "-")
-    album_url = sanitize_filename(album).replace(" ", "-")
-    return f"https://genius.com/albums/{artist_url}/{album_url}"
-
-# Récupère la liste des URL des chansons depuis la page d'un album Genius
-def get_album_songs(album_url):
+# Recherche d’un album via l’API MusicBrainz
+def search_album_mb(artist, album):
+    # Construction de la requête de recherche
+    query = f'release:"{album}" AND artist:"{artist}"'
+    url = "http://musicbrainz.org/ws/2/release/"
     headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; DataScraper/1.0)"
+        "User-Agent": "LyricsProject/1.0 (contact@example.com)"
     }
-    try:
-        response = requests.get(album_url, headers=headers)
-    except Exception as e:
-        print("Erreur de connexion pour", album_url, e)
-        return []
+    params = {
+        "query": query,
+        "fmt": "json",
+        "limit": 1
+    }
+    response = requests.get(url, params=params, headers=headers)
     if response.status_code != 200:
-        print("Erreur lors de la récupération de l'album :", album_url)
-        return []
-    soup = BeautifulSoup(response.text, 'html.parser')
-    song_links = []
-    # Les pages d'album sur Genius affichent généralement les chansons sous forme de "mini cards"
-    for a in soup.find_all('a', class_='mini_card'):
-        href = a.get('href')
-        if href and '/lyrics' in href:
-            song_links.append(href)
-    return song_links
-
-# Extrait l'année de sortie de l'album en scrappant la page (recherche dans les blocs de métadonnées)
-def get_album_year(album_url):
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; DataScraper/1.0)"}
-    try:
-        response = requests.get(album_url, headers=headers)
-    except Exception as e:
-        print("Erreur de connexion pour", album_url, e)
+        print("Erreur MusicBrainz (search) :", response.status_code)
         return None
+    data = response.json()
+    releases = data.get("releases", [])
+    if not releases:
+        return None
+    # On choisit le premier résultat
+    return releases[0]
+
+# Récupère la liste des pistes et d'autres infos via l’API MusicBrainz (avec inc=recordings)
+def get_album_tracks_mb(mbid):
+    url = f"http://musicbrainz.org/ws/2/release/{mbid}"
+    headers = {
+        "User-Agent": "LyricsProject/1.0 (contact@example.com)"
+    }
+    params = {
+        "inc": "recordings",
+        "fmt": "json"
+    }
+    response = requests.get(url, params=params, headers=headers)
     if response.status_code != 200:
-        print("Erreur lors de la récupération de l'album pour l'année :", album_url)
+        print("Erreur MusicBrainz (tracks) :", response.status_code)
         return None
-    soup = BeautifulSoup(response.text, 'html.parser')
-    # Cherche dans les blocs de métadonnées (la classe peut varier)
-    metadata_units = soup.find_all("div", class_="metadata_unit-info")
-    for unit in metadata_units:
-        text = unit.get_text(strip=True)
-        # On cherche un motif d'année (par ex. 2006, 2010, etc.)
-        match = re.search(r"(20\d{2})", text)
-        if match:
-            return int(match.group(1))
-    return None
+    data = response.json()
+    tracks = []
+    # Les pistes sont regroupées dans la liste "media"
+    for medium in data.get("media", []):
+        for track in medium.get("tracks", []):
+            tracks.append(track.get("title"))
+    return tracks
 
-# Récupère les paroles d'une chanson à partir de son URL
-def get_lyrics_from_url(song_url):
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; DataScraper/1.0)"}
-    try:
-        response = requests.get(song_url, headers=headers)
-    except Exception as e:
-        print("Erreur de connexion pour", song_url, e)
-        return None
+# Récupère les paroles d'un morceau via l’API Lyrics.ovh
+def get_track_lyrics(artist, track):
+    url = f"https://api.lyrics.ovh/v1/{artist}/{track}"
+    response = requests.get(url)
     if response.status_code != 200:
-        print("Erreur lors de la récupération de la chanson :", song_url)
+        # Pas de paroles trouvées ou autre erreur
         return None
-    soup = BeautifulSoup(response.text, 'html.parser')
-    # Tentative avec la nouvelle structure de Genius
-    lyrics_div = soup.find("div", class_="Lyrics__Root")
-    if not lyrics_div:
-        # Fallback à l'ancienne structure
-        lyrics_div = soup.find("div", class_="lyrics")
-    if lyrics_div:
-        return lyrics_div.get_text(separator="\n").strip()
-    return None
+    data = response.json()
+    return data.get("lyrics", None)
 
-# (Optionnel) Récupère le titre de la chanson depuis la page
-def get_song_title(song_url):
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; DataScraper/1.0)"}
-    try:
-        response = requests.get(song_url, headers=headers)
-    except Exception as e:
-        print("Erreur de connexion pour", song_url, e)
-        return "Unknown Title"
-    if response.status_code != 200:
-        return "Unknown Title"
-    soup = BeautifulSoup(response.text, 'html.parser')
-    title_tag = soup.find("title")
-    if title_tag:
-        title_text = title_tag.get_text()
-        # Généralement le titre se présente sous la forme "Titre Lyrics | Artiste | Genius"
-        title = title_text.split("Lyrics")[0].strip()
-        return title
-    return "Unknown Title"
-
-# Liste d'albums à traiter.
-# Pour chaque album, on fournit le genre, l'artiste et le nom de l'album.
-# Vous pouvez enrichir ou modifier cette liste selon vos besoins.
+# Liste d'albums à traiter (à adapter)
 albums = [
     {"genre": "Rap", "artist": "Booba", "album": "Ouest Side"},
     {"genre": "Rap", "artist": "PNL", "album": "Le Monde Chico"},
@@ -127,57 +88,56 @@ albums = [
     {"genre": "Musique française", "artist": "Indochine", "album": "13"}
 ]
 
-# Dossier racine où seront enregistrés les fichiers
+# Dossier racine pour l'enregistrement
 root_dir = "lyrics_dataset"
 
-# (Optionnel) Initialisation de l'API Genius pour d'éventuelles recherches complémentaires
-genius = lyricsgenius.Genius("cl2NHO8b_z_1cbU3-VOOxkGsV7892ILTIEuAjLTkXtJc8AgB3rsPMKze86tpakr1", timeout=15, retries=3)
-
-# Traitement de chaque album
 for album in albums:
     genre = album["genre"]
     artist = album["artist"]
     album_title = album["album"]
     
-    album_url = build_album_url(artist, album_title)
-    print(f"Traitement de l'album '{album_title}' de {artist} : {album_url}")
+    print(f"Recherche de l'album '{album_title}' de {artist}...")
+    album_info = search_album_mb(artist, album_title)
+    if album_info is None:
+        print(f"  -> Album introuvable pour {artist} - {album_title}.")
+        continue
     
-    # Récupère l'année de sortie via le scraping de la page album
-    release_year = get_album_year(album_url)
-    if release_year is None:
-        release_year = 0  # ou "Unknown"
+    mbid = album_info.get("id")
+    release_date = album_info.get("date", "")
+    release_year = release_date.split("-")[0] if release_date else "0"
     year_range = get_year_range(release_year)
     
-    # Création de la structure de dossiers : root/genre/year_range/album
+    # Création de l'arborescence : genre / tranche d'années / album
     album_folder = os.path.join(root_dir, sanitize_filename(genre), year_range, sanitize_filename(album_title))
     os.makedirs(album_folder, exist_ok=True)
     
-    # Récupération de la liste des chansons dans l'album
-    song_urls = get_album_songs(album_url)
-    print(f"  {len(song_urls)} chanson(s) trouvée(s).")
+    print(f"  -> Album trouvé (MBID: {mbid}, Année: {release_year}). Récupération des titres...")
+    track_list = get_album_tracks_mb(mbid)
+    if not track_list:
+        print("  -> Aucun titre trouvé pour cet album.")
+        continue
+    print(f"  -> {len(track_list)} titre(s) trouvé(s).")
     
-    # Pour chaque chanson, récupère le titre et les paroles, puis enregistre dans un fichier
-    for song_url in song_urls:
-        print(f"  Traitement de la chanson : {song_url}")
-        title = get_song_title(song_url)
-        lyrics = get_lyrics_from_url(song_url)
+    for track in track_list:
+        print(f"    Traitement du titre : {track}")
+        lyrics = get_track_lyrics(artist, track)
         if not lyrics:
-            print("    Paroles non trouvées pour cette chanson.")
+            print("      -> Paroles non trouvées pour ce titre.")
             continue
         
-        # Création du nom du fichier
-        file_name = sanitize_filename(title) + ".txt"
+        # Création du nom de fichier
+        file_name = sanitize_filename(track) + ".txt"
         file_path = os.path.join(album_folder, file_name)
         
-        # Écriture du fichier texte avec les métadonnées en en-tête
+        # Écriture du fichier avec les métadonnées en en-tête
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(f"Année : {release_year}\n")
             f.write(f"Album : {album_title}\n")
-            f.write(f"Titre : {title}\n")
+            f.write(f"Titre : {track}\n")
             f.write(f"Artiste : {artist}\n")
             f.write("\n")
             f.write(lyrics)
         
-        print(f"    -> Fichier enregistré : {file_path}")
-        time.sleep(1)  # pause entre les chansons
-    time.sleep(2)  # pause entre les albums
+        print(f"      -> Fichier enregistré : {file_path}")
+        time.sleep(0.1)  # Pause entre les titres
+    time.sleep(0.1)  # Pause entre les albums
