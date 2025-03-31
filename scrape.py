@@ -82,11 +82,36 @@ def get_track_lyrics(artist, track):
 albums = [
     {"genre": "Rap", "artist": "Booba", "album": "Ouest Side"},
     {"genre": "Rap", "artist": "PNL", "album": "Le Monde Chico"},
-    {"genre": "Pop", "artist": "Lady Gaga", "album": "The Fame"},
-    {"genre": "Pop", "artist": "Dua Lipa", "album": "Future Nostalgia"},
+    {"genre": "Rap", "artist": "Kaaris", "album": "Or Noir"},
+    {"genre": "Rap", "artist": "La Fouine", "album": "Capitale du Crime"},
+    {"genre": "Rap", "artist": "Orelsan", "album": "Perdu d'avance"},
+    {"genre": "Rap", "artist": "SCH", "album": "JVLIVS"},
+    {"genre": "Rap", "artist": "Lomepal", "album": "Jeannine"},
+    {"genre": "Rap", "artist": "Nekfeu", "album": "Feu"},
+    {"genre": "Rap", "artist": "Lacrim", "album": "Force & Honneur"},
+    {"genre": "Rap", "artist": "Jul", "album": "Je trouve pas le sommeil"},
     {"genre": "Musique française", "artist": "Zaz", "album": "Zaz"},
-    {"genre": "Musique française", "artist": "Indochine", "album": "13"}
+    {"genre": "Musique française", "artist": "Indochine", "album": "13"},
+    {"genre": "Musique française", "artist": "M. Pokora", "album": "À la poursuite du bonheur"},
+    {"genre": "Musique française", "artist": "Amir", "album": "Au cœur de moi"},
+    {"genre": "Musique française", "artist": "Vianney", "album": "Idées blanches"},
+    {"genre": "Musique française", "artist": "Clara Luciani", "album": "Sainte-Victoire"},
+    {"genre": "Musique française", "artist": "Coeur de Pirate", "album": "Blonde"},
+    {"genre": "Musique française", "artist": "Christine and the Queens", "album": "Chris"},
+    {"genre": "Musique française", "artist": "Julien Doré", "album": "Vous & moi"},
+    {"genre": "Musique française", "artist": "Black M", "album": "Éternel insatisfait"},
+    {"genre": "Rock français", "artist": "Noir Désir", "album": "Tostaky"},
+    {"genre": "Rock français", "artist": "Trust", "album": "Répression"},
+    {"genre": "Rock français", "artist": "Téléphone", "album": "Dure Limite"},
+    {"genre": "Rock français", "artist": "Indochine", "album": "L'aventurier"},
+    {"genre": "Rock français", "artist": "BB Brunes", "album": "Nico Teen Love"},
+    {"genre": "Chanson française", "artist": "Édith Piaf", "album": "La Vie en Rose"},
+    {"genre": "Chanson française", "artist": "Jacques Brel", "album": "Amsterdam"},
+    {"genre": "Chanson française", "artist": "Charles Aznavour", "album": "La Bohème"},
+    {"genre": "Chanson française", "artist": "Francis Cabrel", "album": "Samedi soir sur la terre"},
+    {"genre": "Chanson française", "artist": "Zazie", "album": "Zen"}
 ]
+
 
 # Dossier racine pour l'enregistrement
 root_dir = "lyrics_dataset"
