@@ -2,80 +2,240 @@
 
 Ce projet utilise des techniques de NLP pour classifier des paroles de chansons selon différents critères (artiste, album, genre, année).
 
-## Installation
+## Guide de démarrage rapide
+
+### Étape 1: Installation
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/RayanDri/nlp-project-music.git
+git clone https://github.com/Rayandri/nlp-project-music.git
 cd nlp-project-music
+
+# Créer et activer un environnement virtuel (recommandé)
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate     # Windows
 
 # Installer les dépendances
 pip install -r requirements.txt
+
+# Télécharger le modèle spaCy français
+python -m spacy download fr_core_news_sm
 ```
 
-## Utilisation rapide
+### Étape 2: Préparer les données
 
-Pour lancer la classification avec les paramètres optimaux:
+Le projet nécessite des paroles de chansons françaises organisées selon une structure spécifique :
+
+```
+lyrics_dataset/
+├── [année]/
+│   ├── [genre]/
+│   │   ├── [album]-artist-[artiste]/
+│   │   │   ├── [titre].txt
+```
+
+#### Sources de données
+
+Vous avez plusieurs options pour obtenir des paroles:
+
+1. **APIs de paroles**: Plusieurs services proposent des APIs pour récupérer des paroles:
+   - [Genius API](https://docs.genius.com/) (gratuit avec inscription)
+   - [Musixmatch API](https://developer.musixmatch.com/) (gratuit avec limitations)
+
+2. **Datasets publics**: Certains ensembles de données de recherche sont disponibles:
+   - [MTG-Jamendo Dataset](https://mtg.github.io/mtg-jamendo-dataset/) (paroles multilingues)
+   - Datasets sur Kaggle comme "French Song Lyrics"
+
+3. **Web scraping**: Script pour récupérer les paroles de sites spécialisés (attention aux droits d'auteur)
+
+4. **Exemples de test**: Pour un test rapide, vous pouvez créer quelques fichiers manuellement:
+
+```bash
+# Créer une structure minimale pour tester
+mkdir -p lyrics_dataset/2000s/pop/album-artist-Indochine
+echo "J'ai demandé à la lune si tu voulais encore de moi, elle m'a dit oui mais toi je ne sais pas" > lyrics_dataset/2000s/pop/album-artist-Indochine/lune.txt
+
+mkdir -p lyrics_dataset/2010s/rap/album-artist-Nekfeu
+echo "On écrit l'histoire sans effaceur, le temps est compté comme dans Tetris" > lyrics_dataset/2010s/rap/album-artist-Nekfeu/onpark.txt
+
+mkdir -p lyrics_dataset/1980s/chanson/album-artist-JacquesBrel
+echo "Ne me quitte pas, il faut oublier, tout peut s'oublier" > lyrics_dataset/1980s/chanson/album-artist-JacquesBrel/nequittepas.txt
+```
+
+Pour un dataset plus complet, vous devrez soit collecter vous-même les paroles, soit utiliser une des sources ci-dessus.
+
+### Étape 3: Lancer l'application
+
+Plusieurs options s'offrent à vous :
+
+#### Interface Web (recommandée)
+
+```bash
+python web_app.py
+```
+Ensuite, ouvrez votre navigateur à l'adresse : http://127.0.0.1:5000
+
+#### Entraîner le modèle avec les paramètres optimaux
 
 ```bash
 python run.py
 ```
 
-Ce script utilise les meilleurs paramètres déterminés empiriquement:
-- Filtrage des classes avec moins de 5 exemples
-- Conservation des 15 artistes les plus fréquents
-- Tokenisation BPE avec 1500 fusions
-- Suppression des mots vides
-- Vectorisation Bag-of-Words (BOW)
-- Classification par régression logistique avec équilibrage des classes
-
-## Prédiction sur une nouvelle chanson
-
-Pour prédire l'artiste d'une nouvelle chanson:
+#### Prédire l'artiste d'une chanson
 
 ```bash
 # À partir d'un texte
-python predict.py --text "Paroles de la chanson à analyser"
+python predict.py --text "J'ai demandé à la lune si tu voulais encore de moi"
 
 # À partir d'un fichier
-python predict.py --file chemin/vers/fichier.txt
+python predict.py --file chemin/vers/chanson.txt
 ```
 
-La première exécution entraînera automatiquement le modèle. Pour forcer le réentraînement:
+## Guide complet de main.py
+
+Le script `main.py` est le cœur du projet et offre de nombreuses fonctionnalités avancées. Voici un guide détaillé:
+
+### Modes d'exécution
 
 ```bash
-python predict.py --text "Paroles de la chanson" --train
+# Mode "best" - utilise les meilleurs paramètres
+python main.py --mode best
+
+# Mode "tokenize" - uniquement tokeniser le dataset
+python main.py --mode tokenize
+
+# Mode "classify" - utiliser des tokens existants pour la classification
+python main.py --mode classify
+
+# Mode "all" - tokenisation puis classification (défaut)
+python main.py --mode all
 ```
 
-Le script affichera l'artiste prédit et les probabilités associées aux différents artistes possibles.
-
-## Interface Web
-
-Une interface web est disponible pour tester facilement le modèle:
+### Options de classification
 
 ```bash
-python web_app.py
+# Changer le type de label à prédire
+python main.py --label artiste
+python main.py --label album
+python main.py --label genre
+python main.py --label année
+
+# Filtrer les classes par nombre d'exemples minimum
+python main.py --min_samples 5
+
+# Limiter aux N classes les plus fréquentes
+python main.py --top_classes 15
+
+# Définir la graine aléatoire pour la reproductibilité
+python main.py --random_seed 42
 ```
 
-Cela démarre un serveur local accessible à l'adresse http://127.0.0.1:5000. L'interface permet de:
-- Entrer des paroles directement dans un formulaire
-- Visualiser l'artiste prédit et les probabilités associées
-- Entraîner automatiquement le modèle si nécessaire
-
-## Options personnalisées
-
-Pour personnaliser les paramètres interactivement:
+### Options de tokenisation
 
 ```bash
+# Modifier le nombre de fusions BPE
+python main.py --bpe_merges 1000
+
+# Activer la suppression des mots vides
+python main.py --use_stopwords
+
+# Spécifier les dossiers d'entrée/sortie
+python main.py --input_dir mon_dataset --output_dir mes_tokens
+```
+
+### Méthodes de vectorisation
+
+```bash
+# Utiliser une méthode spécifique
+python main.py --vectorizers bow
+python main.py --vectorizers tfidf
+python main.py --vectorizers word2vec
+python main.py --vectorizers fasttext
+python main.py --vectorizers transformer
+
+# Combiner plusieurs méthodes
+python main.py --vectorizers bow tfidf
+
+# Tester toutes les méthodes
+python main.py --vectorizers all
+```
+
+### Algorithmes de classification
+
+```bash
+# Régression logistique (défaut)
+python main.py --classifier logistic
+
+# Machine à vecteurs de support
+python main.py --classifier svm
+
+# Forêts aléatoires
+python main.py --classifier random_forest
+```
+
+### Réduction de dimensionnalité et visualisation
+
+```bash
+# Appliquer une réduction PCA
+python main.py --pca 100
+
+# Générer une matrice de confusion
+python main.py --confusion_matrix
+
+# Sauvegarder les vecteurs pour analyse externe
+python main.py --save_vectors
+```
+
+### Entraînement et sauvegarde de modèles
+
+```bash
+# Sauvegarder les modèles entraînés pour prédiction future
+python main.py --save_models models_dir
+```
+
+### Exemple complet avancé
+
+```bash
+python main.py \
+  --mode all \
+  --label artiste \
+  --min_samples 5 \
+  --top_classes 10 \
+  --vectorizers bow \
+  --classifier svm \
+  --bpe_merges 2000 \
+  --use_stopwords \
+  --pca 200 \
+  --confusion_matrix \
+  --save_models my_models
+```
+
+Cette commande va:
+1. Filtrer le dataset pour garder les 10 artistes avec au moins 5 chansons chacun
+2. Tokeniser les paroles avec 2000 fusions BPE et suppression des mots vides
+3. Vectoriser avec Bag-of-Words et réduire à 200 dimensions par PCA
+4. Classifier avec SVM
+5. Générer une matrice de confusion et sauvegarder le modèle
+
+## Options avancées
+
+### Personnalisation des paramètres
+
+```bash
+# Interface interactive
 python run.py --mode custom
-```
 
-Pour spécifier directement les paramètres:
-
-```bash
+# Paramètres spécifiques
 python main.py --min_samples 5 --top_classes 10 --vectorizers bow --classifier svm
 ```
 
+### Analyse du dataset
+
+```bash
+python analyze_dataset.py
+```
 ## Structure du projet
 
 - `main.py`: Script principal pour la tokenisation et classification
@@ -89,19 +249,15 @@ python main.py --min_samples 5 --top_classes 10 --vectorizers bow --classifier s
   - `vectorizers.py`: Différentes méthodes de vectorisation de texte
   - `models.py`: Modèles de classification et évaluation
 
-## Fonctionnalités
+## Résolution de problèmes
 
-- **Tokenisation BPE**: Apprentissage de sous-mots spécifiques au corpus
-- **Vectorisation**: Plusieurs méthodes (BOW, TF-IDF, Word2Vec, FastText, Transformer)
-- **Classification**: Différents algorithmes (Régression logistique, SVM, Random Forest)
-- **Analyse de données**: Outils pour comprendre la distribution des classes
-- **Évaluation**: Matrices de confusion, F1-score, précision, validation croisée
-- **Prédiction**: Identification de l'artiste d'une nouvelle chanson
-- **Interface web**: Application conviviale pour tester le modèle
+- **Erreur "No module named 'flask'"** : Exécutez `pip install flask`
+- **Erreur avec spaCy** : Vérifiez que le modèle français est installé avec `python -m spacy validate`
+- **Problèmes de mémoire** : Réduisez le nombre de classes avec `--top_classes` ou utilisez moins de vectoriseurs
 
-## Résultats
+## Performances
 
-Les meilleurs résultats ont été obtenus avec:
+Les meilleurs résultats sont obtenus avec:
 - Vectorisation: Bag-of-Words (BOW)
 - Classification: Régression logistique avec équilibrage des classes
 - Précision: ~60% sur la classification des 15 artistes les plus fréquents
@@ -112,3 +268,4 @@ Les meilleurs résultats ont été obtenus avec:
 - Extraction de caractéristiques spécifiques aux paroles (rimes, structure)
 - Modèles plus complexes comme BERT fine-tuné sur le français
 - Approche hiérarchique (classification par genre puis par artiste)
+
