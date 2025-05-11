@@ -7,17 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 class TextClassifier:
-    """
-    Classifier for vectorized text documents
-    """
     def __init__(self, model_type: str = "logistic", **kwargs):
-        """
-        Initialize classifier
-        
-        Args:
-            model_type: Model type ('logistic' for logistic regression)
-            **kwargs: Additional model parameters
-        """
         self.model_type = model_type.lower()
         self.model = None
         
@@ -33,34 +23,17 @@ class TextClassifier:
     
     def train(self, X: np.ndarray, y: List[str], test_size: float = 0.2, 
              random_state: int = 42, stratify: bool = True) -> Dict[str, Any]:
-        """
-        Train model and evaluate performance
-        
-        Args:
-            X: Feature matrix (vectorized documents)
-            y: List of labels
-            test_size: Test set proportion
-            random_state: Random seed
-            stratify: Whether to stratify sampling by label
-            
-        Returns:
-            Evaluation results dictionary
-        """
-        # Split data into train/test
         stratify_data = y if stratify else None
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=test_size, random_state=random_state, stratify=stratify_data
         )
         
-        # Train model
         self.model.fit(X_train, y_train)
         
-        # Evaluate on test set
         y_pred = self.model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
         report = classification_report(y_test, y_pred, output_dict=True)
         
-        # Create confusion matrix
         cm = confusion_matrix(y_test, y_pred)
         
         return {
@@ -72,15 +45,6 @@ class TextClassifier:
         }
     
     def predict(self, X: np.ndarray) -> List[str]:
-        """
-        Predict labels for new data
-        
-        Args:
-            X: Feature matrix (vectorized documents)
-            
-        Returns:
-            List of predictions
-        """
         if self.model is None:
             raise ValueError("Model not trained. Call train() first.")
         
@@ -89,15 +53,6 @@ class TextClassifier:
 def plot_confusion_matrix(cm: np.ndarray, labels: List[str], 
                          title: str = "Confusion Matrix", 
                          figsize: Tuple[int, int] = (10, 8)) -> None:
-    """
-    Display confusion matrix
-    
-    Args:
-        cm: Confusion matrix
-        labels: List of labels
-        title: Plot title
-        figsize: Figure size
-    """
     plt.figure(figsize=figsize)
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
     plt.xlabel('Predictions')
@@ -107,20 +62,12 @@ def plot_confusion_matrix(cm: np.ndarray, labels: List[str],
     plt.show()
 
 def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -> None:
-    """
-    Compare performance of different embedding methods
-    
-    Args:
-        embedding_results: Dictionary {method_name: evaluation_results}
-    """
     methods = list(embedding_results.keys())
     accuracies = [results["accuracy"] for results in embedding_results.values()]
     
-    # Display overall performance
     plt.figure(figsize=(10, 6))
     bars = plt.bar(methods, accuracies, color="skyblue")
     
-    # Add values on bars
     for bar in bars:
         height = bar.get_height()
         plt.text(bar.get_x() + bar.get_width()/2., height + 0.01,
@@ -133,15 +80,12 @@ def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -
     plt.tight_layout()
     plt.show()
     
-    # Show F1-scores by class for each method
     for method, results in embedding_results.items():
         report = results["classification_report"]
         
-        # Exclude averages and support
         classes = [cls for cls in report.keys() if cls not in ["accuracy", "macro avg", "weighted avg"]]
         f1_scores = [report[cls]["f1-score"] for cls in classes]
         
-        # Limit number of classes to display if too many
         max_classes = 15
         if len(classes) > max_classes:
             indices = np.argsort(f1_scores)[-max_classes:]

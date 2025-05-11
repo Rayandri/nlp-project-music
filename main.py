@@ -14,44 +14,28 @@ from utils.models import TextClassifier, evaluate_multiple_embeddings
 def parse_args():
     parser = argparse.ArgumentParser(description="Lyrics classification")
     
-    parser.add_argument("--input_dir", type=str, default="lyrics_dataset",
-                        help="Directory containing lyrics data")
-    
-    parser.add_argument("--output_dir", type=str, default="tokenized_lyrics_dataset",
-                        help="Output directory for tokenized lyrics")
-    
-    parser.add_argument("--mode", type=str, choices=["tokenize", "classify", "all"], default="all",
-                        help="Execution mode")
-    
-    parser.add_argument("--label", type=str, choices=["artiste", "album", "genre", "année"], default="artiste",
-                        help="Target label to predict")
-    
+    parser.add_argument("--input_dir", type=str, default="lyrics_dataset")
+    parser.add_argument("--output_dir", type=str, default="tokenized_lyrics_dataset")
+    parser.add_argument("--mode", type=str, choices=["tokenize", "classify", "all"], default="all")
+    parser.add_argument("--label", type=str, choices=["artiste", "album", "genre", "année"], default="artiste")
     parser.add_argument("--vectorizers", type=str, nargs="+", 
                         choices=["bow", "tfidf", "word2vec", "fasttext", "transformer", "all"],
-                        default=["all"],
-                        help="Vectorization methods to use")
-    
-    parser.add_argument("--save_vectors", action="store_true",
-                        help="Save generated vectors as .npy files")
-    
-    parser.add_argument("--random_seed", type=int, default=42,
-                        help="Random seed for reproducibility")
+                        default=["all"])
+    parser.add_argument("--save_vectors", action="store_true")
+    parser.add_argument("--random_seed", type=int, default=42)
     
     return parser.parse_args()
 
 def main():
     args = parse_args()
     
-    # Load data
     print("\n=== Loading data ===")
     texts, metadata_list = load_lyrics_dataset(args.input_dir)
     print(f"Total songs: {len(texts)}")
     
-    # Extract labels
     labels = get_label_from_metadata(metadata_list, args.label)
     print(f"Unique {args.label}s: {len(set(labels))}")
     
-    # Tokenization
     if args.mode in ["tokenize", "all"]:
         print("\n=== Tokenizing lyrics ===")
         tokenizer = BPETokenizer(dataset=texts)
@@ -59,7 +43,6 @@ def main():
         print(f"Tokenized texts: {len(tokenized_texts)}")
         save_tokenized_lyrics(tokenized_texts, metadata_list, args.output_dir)
     
-    # Vectorization and classification
     if args.mode in ["classify", "all"]:
         print("\n=== Vectorization and classification ===")
         vectorization_methods = []
