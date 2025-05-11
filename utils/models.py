@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from collections import Counter
 
 class TextClassifier:
     def __init__(self, model_type: str = "logistic", **kwargs):
@@ -23,7 +24,18 @@ class TextClassifier:
     
     def train(self, X: np.ndarray, y: List[str], test_size: float = 0.2, 
              random_state: int = 42, stratify: bool = True) -> Dict[str, Any]:
-        stratify_data = y if stratify else None
+        stratify_data = None
+        if stratify:
+            # Check if all classes have at least 2 samples for stratification
+            class_counts = Counter(y)
+            min_count = min(class_counts.values())
+            
+            if min_count >= 2:
+                stratify_data = y
+            else:
+                print(f"Warning: Some classes have fewer than 2 samples (minimum: {min_count}).")
+                print("Falling back to non-stratified split.")
+        
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=test_size, random_state=random_state, stratify=stratify_data
         )

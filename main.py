@@ -23,6 +23,7 @@ def parse_args():
                         default=["all"])
     parser.add_argument("--save_vectors", action="store_true")
     parser.add_argument("--random_seed", type=int, default=42)
+    parser.add_argument("--min_samples", type=int, default=1, help="Minimum samples per class")
     
     return parser.parse_args()
 
@@ -35,6 +36,20 @@ def main():
     
     labels = get_label_from_metadata(metadata_list, args.label)
     print(f"Unique {args.label}s: {len(set(labels))}")
+    
+    # Filter out classes with too few samples
+    if args.min_samples > 1:
+        from collections import Counter
+        label_counts = Counter(labels)
+        valid_labels = {label for label, count in label_counts.items() if count >= args.min_samples}
+        
+        filtered_indices = [i for i, label in enumerate(labels) if label in valid_labels]
+        texts = [texts[i] for i in filtered_indices]
+        metadata_list = [metadata_list[i] for i in filtered_indices]
+        labels = [labels[i] for i in filtered_indices]
+        
+        print(f"Filtered to {len(texts)} songs with at least {args.min_samples} samples per {args.label}")
+        print(f"Remaining unique {args.label}s: {len(valid_labels)}")
     
     if args.mode in ["tokenize", "all"]:
         print("\n=== Tokenizing lyrics ===")
