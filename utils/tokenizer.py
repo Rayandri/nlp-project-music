@@ -3,13 +3,21 @@ import json
 import re
 import spacy
 from collections import defaultdict, Counter
+import string
 
 class BPETokenizer:
-    def __init__(self, path=".datas/merges_bpe.json", num_merges=1000, dataset=None):
+    def __init__(self, path=".datas/merges_bpe.json", num_merges=1000, dataset=None, use_stopwords=True):
         self.path = path
         self.num_merges = num_merges
         self.merges = None
         self.nlp = spacy.load("fr_core_news_sm")
+        self.use_stopwords = use_stopwords
+        
+        # Define French stopwords (common words that don't carry much meaning)
+        self.stopwords = set(['le', 'la', 'les', 'un', 'une', 'des', 'et', 'est', 'il', 'elle', 
+                             'ils', 'elles', 'ce', 'cette', 'ces', 'se', 'sa', 'son', 'ses',
+                             'on', 'nous', 'vous', 'qui', 'que', 'quoi', 'dont', 'où', 'je',
+                             'tu', 'de', 'a', 'pour', 'en', 'dans', 'par', 'sur', 'au', 'aux'])
 
         if dataset is not None:
             self.learn_merges(dataset)
@@ -17,9 +25,26 @@ class BPETokenizer:
             self._load_merges()
 
     def preprocess_sentence(self, sentence):
-        doc = self.nlp(sentence.lower())
-        tokens = [token.lemma_ for token in doc if token.is_alpha]
-        return " ".join(tokens)
+        # Convert to lowercase
+        text = sentence.lower()
+        
+        # Remove punctuation
+        text = re.sub(f'[{re.escape(string.punctuation)}]', ' ', text)
+        
+        # Process with spaCy
+        doc = self.nlp(text)
+        
+        # Extract lemmas, filter alpha and optionally filter stopwords
+        if self.use_stopwords:
+            tokens = [token.lemma_ for token in doc if token.is_alpha and token.lemma_ not in self.stopwords]
+        else:
+            tokens = [token.lemma_ for token in doc if token.is_alpha]
+        
+        # Join and normalize whitespace
+        text = " ".join(tokens)
+        text = re.sub(r'\s+', ' ', text).strip()
+        
+        return text
 
     def _get_vocab(self, corpus):
         vocab = defaultdict(int)
@@ -55,11 +80,15 @@ class BPETokenizer:
         return new_vocab
 
     def learn_merges(self, dataset):
-        print("Learning BPE merges...")
+        print(f"Learning BPE merges (num_merges={self.num_merges})...")
+        print("Preprocessing dataset...")
         preprocessed = [self.preprocess_sentence(s) for s in dataset]
+        
+        print("Building vocabulary...")
         vocab = self._get_vocab(preprocessed)
         merges = []
 
+        print("Performing BPE merges...")
         for i in range(self.num_merges):
             pairs = self._get_stats(vocab)
             if not pairs:
@@ -67,10 +96,19 @@ class BPETokenizer:
             best = max(pairs, key=pairs.get)
             vocab = self._merge_vocab(best, vocab)
             merges.append(best)
+            
+            # Print progress every 100 merges
+            if (i+1) % 100 == 0:
+                print(f"  Progress: {i+1}/{self.num_merges} merges")
 
         self.merges = merges
         self._save_merges()
         print(f"{len(merges)} merges learned and saved.")
+        
+        # Also print vocabulary statistics
+        word_pieces = [token for word in vocab.keys() for token in word]
+        most_common = Counter(word_pieces).most_common(10)
+        print(f"Most common tokens: {most_common}")
 
     def _apply_bpe_to_word(self, word):
         word = list(word) + ["</w>"]
@@ -87,6 +125,7 @@ class BPETokenizer:
         with open(self.path, "r", encoding="utf-8") as f:
             merges = json.load(f)
         self.merges = [tuple(pair) for pair in merges]
+        print(f"Loaded {len(self.merges)} BPE merges from {self.path}")
 
     def _save_merges(self):
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
