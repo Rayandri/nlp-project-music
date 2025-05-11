@@ -66,7 +66,17 @@ echo "Ne me quitte pas, il faut oublier, tout peut s'oublier" > lyrics_dataset/1
 
 Pour un dataset plus complet, vous devrez soit collecter vous-même les paroles, soit utiliser une des sources ci-dessus.
 
-### Étape 3: Lancer l'application
+### Étape 3: Charger les données
+
+Avant de lancer l'application ou d'entraîner un modèle, il faut charger les données:
+
+```bash
+python data_loader.py
+```
+
+Cela préparera vos fichiers de paroles pour l'utilisation dans les étapes suivantes.
+
+### Étape 4: Lancer l'application
 
 Plusieurs options s'offrent à vous :
 
