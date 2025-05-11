@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
+import pickle
 import argparse
 import numpy as np
 from typing import List, Dict
@@ -55,6 +57,8 @@ def parse_args():
                         help="Sauvegarder les vecteurs")
     parser.add_argument("--confusion_matrix", action="store_true", default=True, 
                         help="Générer la matrice de confusion")
+    parser.add_argument("--save_models", type=str, 
+                        help="Sauvegarder les modèles entraînés dans le répertoire spécifié")
     
     args = parser.parse_args()
     
@@ -71,6 +75,30 @@ def parse_args():
         print("Mode 'best': utilisation des paramètres optimaux")
         
     return args
+
+def save_models(tokenizer, vectorizer, classifier, labels, output_dir):
+    """Sauvegarde les modèles entraînés pour une utilisation ultérieure"""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Créer un mapping des labels pour la prédiction
+    unique_labels = sorted(list(set(labels)))
+    label_map = {i: label for i, label in enumerate(unique_labels)}
+    
+    # Sauvegarder les modèles
+    with open(os.path.join(output_dir, "tokenizer.pkl"), 'wb') as f:
+        pickle.dump(tokenizer, f)
+        
+    with open(os.path.join(output_dir, "vectorizer.pkl"), 'wb') as f:
+        pickle.dump(vectorizer, f)
+        
+    with open(os.path.join(output_dir, "classifier.pkl"), 'wb') as f:
+        pickle.dump(classifier, f)
+        
+    with open(os.path.join(output_dir, "labels.pkl"), 'wb') as f:
+        pickle.dump(label_map, f)
+        
+    print(f"Modèles sauvegardés dans {output_dir}")
+    print(f"Nombre de classes: {len(unique_labels)}")
 
 def main():
     args = parse_args()
@@ -111,6 +139,7 @@ def main():
         print(f"Filtré à {len(texts)} chansons des {args.top_classes} {args.label}s les plus fréquents")
         print(f"{args.label}s uniques restants: {len(set(labels))}")
     
+    # Initialiser le tokenizer
     if args.mode in ["tokenize", "all"]:
         print("\n=== Tokenisation des paroles ===")
         tokenizer = BPETokenizer(
@@ -121,6 +150,16 @@ def main():
         tokenized_texts = [tokenizer(text) for text in texts]
         print(f"Textes tokenisés: {len(tokenized_texts)}")
         save_tokenized_lyrics(tokenized_texts, metadata_list, args.output_dir)
+    else:
+        # Si on ne tokenize pas, il faut quand même créer le tokenizer
+        tokenizer = BPETokenizer(
+            num_merges=args.bpe_merges,
+            use_stopwords=args.use_stopwords
+        )
+    
+    # Variables pour stocker le meilleur modèle
+    best_vectorizer = None
+    best_classifier = None
     
     if args.mode in ["classify", "all"]:
         print("\n=== Vectorisation et classification ===")
@@ -148,6 +187,10 @@ def main():
                 explained_var = sum(pca.explained_variance_ratio_) * 100
                 print(f"PCA appliquée: {X.shape[1]} -> {args.pca} dimensions ({explained_var:.2f}% variance conservée)")
                 X = X_reduced
+                
+                # Mettre à jour le vectorizer pour la prédiction
+                original_transform = vectorizer.transform
+                vectorizer.transform = lambda texts: pca.transform(original_transform(texts))
             
             if args.save_vectors:
                 output_dir = "vectors"
@@ -177,6 +220,8 @@ def main():
                 best_accuracy = accuracy
                 best_method = method
                 best_X = X
+                best_vectorizer = vectorizer
+                best_classifier = classifier
         
         if len(results) > 1:
             print("\n=== Comparaison des méthodes de vectorisation ===")
@@ -217,6 +262,10 @@ def main():
             print(f"Nombre de classes: {len(set(labels))}")
             print(f"Nombre d'échantillons: {len(texts)}")
             print("--------------------------------------------------")
+        
+        # Sauvegarder les modèles si demandé
+        if args.save_models and best_vectorizer and best_classifier:
+            save_models(tokenizer, best_vectorizer, best_classifier, labels, args.save_models)
 
 if __name__ == "__main__":
     main() 

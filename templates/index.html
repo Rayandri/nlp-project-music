@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classifieur de Paroles</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto py-8 px-4">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Classifieur d'Artistes</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <form method="POST" class="space-y-4">
+                <div>
+                    <textarea name="lyrics" placeholder="Entrez les paroles ici..." 
+                              class="w-full h-48 p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">{{ lyrics }}</textarea>
+                </div>
+                
+                <div>
+                    <button type="submit" 
+                            class="px-5 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Prédire l'artiste
+                    </button>
+                </div>
+                
+                {% if not models_ready %}
+                <p class="text-sm text-gray-600 italic">
+                    Note: Le modèle sera entraîné lors de la première prédiction (cela peut prendre quelques minutes).
+                </p>
+                {% endif %}
+            </form>
+        </div>
+        
+        {% if prediction %}
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Résultat</h2>
+            
+            <div class="mb-6">
+                <p class="text-xl font-bold text-blue-800">Artiste prédit: {{ prediction }}</p>
+            </div>
+            
+            {% if probabilities %}
+            <div>
+                <h3 class="text-lg font-medium mb-3">Probabilités</h3>
+                
+                <div class="space-y-3">
+                    {% for artist, prob in probabilities %}
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span>{{ artist }}</span>
+                            <span>{{ "%.1f"|format(prob*100) }}%</span>
+                        </div>
+                        <div class="h-2 bg-gray-200 rounded">
+                            <div class="h-2 bg-blue-600 rounded" style="width: {{ prob*100 }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <footer class="mt-8 text-center text-sm text-gray-500">
+            Projet NLP - Classification d'artistes de musique française
+        </footer>
+    </div>
+</body>
+</html> 
