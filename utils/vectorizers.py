@@ -6,23 +6,23 @@ from sentence_transformers import SentenceTransformer
 
 class TextVectorizer:
     """
-    Classe pour vectoriser les textes selon différentes méthodes
+    Text vectorization with multiple methods
     """
     def __init__(self, method: str = "tfidf", vector_size: int = 100, **kwargs):
         """
-        Initialise le vectoriseur
+        Initialize vectorizer
         
         Args:
-            method: Méthode de vectorisation ('bow', 'tfidf', 'word2vec', 'fasttext', 'transformer')
-            vector_size: Taille des vecteurs Word2Vec et FastText
-            **kwargs: Arguments supplémentaires pour les modèles
+            method: Vectorization method ('bow', 'tfidf', 'word2vec', 'fasttext', 'transformer')
+            vector_size: Size of Word2Vec and FastText vectors
+            **kwargs: Additional model parameters
         """
         self.method = method.lower()
         self.vector_size = vector_size
         self.model = None
         self.kwargs = kwargs
         
-        # Initialiser le modèle selon la méthode choisie
+        # Initialize model based on method
         if self.method == "bow":
             self.model = CountVectorizer(**kwargs)
         elif self.method == "tfidf":
@@ -33,10 +33,10 @@ class TextVectorizer:
     
     def fit(self, documents: List[str]) -> None:
         """
-        Entraîne le vectoriseur sur les documents
+        Train vectorizer on documents
         
         Args:
-            documents: Liste de documents (textes)
+            documents: List of document texts
         """
         if self.method in ["bow", "tfidf"]:
             self.model.fit(documents)
@@ -63,16 +63,16 @@ class TextVectorizer:
     
     def transform(self, documents: List[str]) -> np.ndarray:
         """
-        Transforme les documents en vecteurs
+        Transform documents to vectors
         
         Args:
-            documents: Liste de documents (textes)
+            documents: List of document texts
             
         Returns:
-            Matrice des documents vectorisés
+            Matrix of vectorized documents
         """
         if self.model is None:
-            raise ValueError("Le modèle n'a pas été entraîné. Appelez fit() d'abord.")
+            raise ValueError("Model not trained. Call fit() first.")
             
         if self.method in ["bow", "tfidf"]:
             X = self.model.transform(documents)
@@ -85,31 +85,31 @@ class TextVectorizer:
     
     def fit_transform(self, documents: List[str]) -> np.ndarray:
         """
-        Entraîne le vectoriseur et transforme les documents
+        Train vectorizer and transform documents
         
         Args:
-            documents: Liste de documents (textes)
+            documents: List of document texts
             
         Returns:
-            Matrice des documents vectorisés
+            Matrix of vectorized documents
         """
         self.fit(documents)
         return self.transform(documents)
     
     def _document_vector(self, tokens: List[str]) -> np.ndarray:
         """
-        Calcule le vecteur moyen d'un document pour Word2Vec et FastText
+        Calculate average document vector for Word2Vec and FastText
         
         Args:
-            tokens: Liste de tokens d'un document
+            tokens: List of document tokens
             
         Returns:
-            Vecteur moyen du document
+            Average document vector
         """
         if self.method == "word2vec":
             valid_tokens = [token for token in tokens if token in self.model.wv.key_to_index]
         elif self.method == "fasttext":
-            valid_tokens = tokens  # FastText peut gérer les mots inconnus
+            valid_tokens = tokens  # FastText can handle unknown words
         else:
             return np.zeros(self.vector_size)
             

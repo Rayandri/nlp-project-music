@@ -55,7 +55,7 @@ class BPETokenizer:
         return new_vocab
 
     def learn_merges(self, dataset):
-        print("Apprentissage des merges BPE...")
+        print("Learning BPE merges...")
         preprocessed = [self.preprocess_sentence(s) for s in dataset]
         vocab = self._get_vocab(preprocessed)
         merges = []
@@ -70,7 +70,7 @@ class BPETokenizer:
 
         self.merges = merges
         self._save_merges()
-        print(f"{len(merges)} merges appris et saved.")
+        print(f"{len(merges)} merges learned and saved.")
 
     def _apply_bpe_to_word(self, word):
         word = list(word) + ["</w>"]
@@ -95,7 +95,7 @@ class BPETokenizer:
 
     def _clean_text(self, text):
         text = text.lower()
-        text = re.sub(r"[^\w\s']", " ", text)  # garder les apostrophes
+        text = re.sub(r"[^\w\s']", " ", text)  # keep apostrophes
         text = re.sub(r"\s+", " ", text).strip()
         return text
 

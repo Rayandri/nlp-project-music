@@ -8,15 +8,15 @@ import seaborn as sns
 
 class TextClassifier:
     """
-    Classe pour entraîner et évaluer des modèles de classification sur des textes vectorisés
+    Classifier for vectorized text documents
     """
     def __init__(self, model_type: str = "logistic", **kwargs):
         """
-        Initialise le classifieur
+        Initialize classifier
         
         Args:
-            model_type: Type de modèle ('logistic' pour régression logistique)
-            **kwargs: Paramètres supplémentaires pour le modèle
+            model_type: Model type ('logistic' for logistic regression)
+            **kwargs: Additional model parameters
         """
         self.model_type = model_type.lower()
         self.model = None
@@ -29,38 +29,38 @@ class TextClassifier:
                 n_jobs=kwargs.get("n_jobs", -1)
             )
         else:
-            raise ValueError(f"Type de modèle non supporté: {model_type}")
+            raise ValueError(f"Unsupported model type: {model_type}")
     
     def train(self, X: np.ndarray, y: List[str], test_size: float = 0.2, 
              random_state: int = 42, stratify: bool = True) -> Dict[str, Any]:
         """
-        Entraîne le modèle et évalue ses performances
+        Train model and evaluate performance
         
         Args:
-            X: Matrice de features (documents vectorisés)
-            y: Liste des labels
-            test_size: Proportion du jeu de test
-            random_state: Graine aléatoire pour la reproductibilité
-            stratify: Si True, stratifie l'échantillonnage par label
+            X: Feature matrix (vectorized documents)
+            y: List of labels
+            test_size: Test set proportion
+            random_state: Random seed
+            stratify: Whether to stratify sampling by label
             
         Returns:
-            Dictionnaire des résultats d'évaluation
+            Evaluation results dictionary
         """
-        # Diviser les données en train/test
+        # Split data into train/test
         stratify_data = y if stratify else None
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=test_size, random_state=random_state, stratify=stratify_data
         )
         
-        # Entraîner le modèle
+        # Train model
         self.model.fit(X_train, y_train)
         
-        # Évaluer sur le jeu de test
+        # Evaluate on test set
         y_pred = self.model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
         report = classification_report(y_test, y_pred, output_dict=True)
         
-        # Créer la matrice de confusion
+        # Create confusion matrix
         cm = confusion_matrix(y_test, y_pred)
         
         return {
@@ -73,75 +73,75 @@ class TextClassifier:
     
     def predict(self, X: np.ndarray) -> List[str]:
         """
-        Prédit les labels pour de nouvelles données
+        Predict labels for new data
         
         Args:
-            X: Matrice de features (documents vectorisés)
+            X: Feature matrix (vectorized documents)
             
         Returns:
-            Liste des prédictions
+            List of predictions
         """
         if self.model is None:
-            raise ValueError("Le modèle n'a pas été entraîné. Appelez train() d'abord.")
+            raise ValueError("Model not trained. Call train() first.")
         
         return self.model.predict(X)
 
 def plot_confusion_matrix(cm: np.ndarray, labels: List[str], 
-                         title: str = "Matrice de confusion", 
+                         title: str = "Confusion Matrix", 
                          figsize: Tuple[int, int] = (10, 8)) -> None:
     """
-    Affiche la matrice de confusion
+    Display confusion matrix
     
     Args:
-        cm: Matrice de confusion
-        labels: Liste des labels
-        title: Titre du graphique
-        figsize: Taille de la figure
+        cm: Confusion matrix
+        labels: List of labels
+        title: Plot title
+        figsize: Figure size
     """
     plt.figure(figsize=figsize)
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
-    plt.xlabel('Prédictions')
-    plt.ylabel('Valeurs réelles')
+    plt.xlabel('Predictions')
+    plt.ylabel('Actual values')
     plt.title(title)
     plt.tight_layout()
     plt.show()
 
 def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -> None:
     """
-    Compare les performances de différentes méthodes d'embedding
+    Compare performance of different embedding methods
     
     Args:
-        embedding_results: Dictionnaire {nom_méthode: résultats_évaluation}
+        embedding_results: Dictionary {method_name: evaluation_results}
     """
     methods = list(embedding_results.keys())
     accuracies = [results["accuracy"] for results in embedding_results.values()]
     
-    # Afficher les performances globales
+    # Display overall performance
     plt.figure(figsize=(10, 6))
     bars = plt.bar(methods, accuracies, color="skyblue")
     
-    # Ajouter les valeurs sur les barres
+    # Add values on bars
     for bar in bars:
         height = bar.get_height()
         plt.text(bar.get_x() + bar.get_width()/2., height + 0.01,
                 f'{height:.3f}', ha='center', va='bottom')
     
-    plt.xlabel('Méthode d\'embedding')
+    plt.xlabel('Embedding method')
     plt.ylabel('Accuracy')
-    plt.title('Comparaison des performances des différentes méthodes d\'embedding')
+    plt.title('Performance comparison of embedding methods')
     plt.ylim(0, max(accuracies) + 0.1)
     plt.tight_layout()
     plt.show()
     
-    # Afficher les F1-scores par classe pour chaque méthode
+    # Show F1-scores by class for each method
     for method, results in embedding_results.items():
         report = results["classification_report"]
         
-        # Exclure les moyennes et le support
+        # Exclude averages and support
         classes = [cls for cls in report.keys() if cls not in ["accuracy", "macro avg", "weighted avg"]]
         f1_scores = [report[cls]["f1-score"] for cls in classes]
         
-        # Limiter le nombre de classes à afficher si trop nombreuses
+        # Limit number of classes to display if too many
         max_classes = 15
         if len(classes) > max_classes:
             indices = np.argsort(f1_scores)[-max_classes:]
@@ -151,8 +151,8 @@ def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -
         plt.figure(figsize=(12, 6))
         plt.barh(classes, f1_scores, color="lightgreen")
         plt.xlabel('F1-score')
-        plt.ylabel('Classe')
-        plt.title(f'F1-scores par classe pour {method}')
+        plt.ylabel('Class')
+        plt.title(f'F1-scores by class for {method}')
         plt.xlim(0, 1.0)
         plt.tight_layout()
         plt.show() 
