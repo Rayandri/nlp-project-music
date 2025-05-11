@@ -259,12 +259,6 @@ python analyze_dataset.py
   - `vectorizers.py`: Différentes méthodes de vectorisation de texte
   - `models.py`: Modèles de classification et évaluation
 
-## Résolution de problèmes
-
-- **Erreur "No module named 'flask'"** : Exécutez `pip install flask`
-- **Erreur avec spaCy** : Vérifiez que le modèle français est installé avec `python -m spacy validate`
-- **Problèmes de mémoire** : Réduisez le nombre de classes avec `--top_classes` ou utilisez moins de vectoriseurs
-
 ## Performances
 
 Les meilleurs résultats sont obtenus avec:
