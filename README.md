@@ -1,59 +1,77 @@
-# French Lyrics Classification
+# Classification de Paroles Musicales
 
-NLP project for analyzing French song lyrics corpus and predicting metadata like artist, album, genre or year.
-
-## Project Structure
-
-```
-.
-├── lyrics_dataset/            # Raw data (lyrics with metadata) 
-├── tokenized_lyrics_dataset/  # Tokenized data (auto-generated)
-├── vectors/                   # Vector representations (auto-generated)
-├── utils/                     # Utility modules
-│   ├── tokenizer.py           # BPE Tokenizer
-│   ├── data_loader.py         # Data loading
-│   ├── vectorizers.py         # Vectorization methods
-│   └── models.py              # Classification models
-└── main.py                    # Main script
-```
+Ce projet utilise des techniques de NLP pour classifier des paroles de chansons selon différents critères (artiste, album, genre, année).
 
 ## Installation
 
 ```bash
-git clone <repo_url>
+# Cloner le dépôt
+git clone https://github.com/RayanDri/nlp-project-music.git
 cd nlp-project-music
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
+
+# Installer les dépendances
 pip install -r requirements.txt
-python -m spacy download fr_core_news_sm
 ```
 
-## Usage
+## Utilisation rapide
+
+Pour lancer la classification avec les paramètres optimaux:
 
 ```bash
-# Full pipeline (tokenize + classify)
-python main.py
-
-# Tokenize only
-python main.py --mode tokenize
-
-# Classify only
-python main.py --mode classify
-
-# Change target to predict
-python main.py --label artiste  # Options: artiste, album, genre, année
-
-# Select vectorization methods
-python main.py --vectorizers tfidf transformer  # Options: bow, tfidf, word2vec, fasttext, transformer, all
-
-# Save vectors
-python main.py --save_vectors
+python run.py
 ```
 
-## Embedding Methods
+Ce script utilise les meilleurs paramètres déterminés empiriquement:
+- Filtrage des classes avec moins de 5 exemples
+- Conservation des 15 artistes les plus fréquents
+- Tokenisation BPE avec 1500 fusions
+- Suppression des mots vides
+- Vectorisation Bag-of-Words (BOW)
+- Classification par régression logistique avec équilibrage des classes
 
-1. **Bag-of-Words (BOW)**
-2. **TF-IDF**
-3. **Word2Vec** (Gensim)
-4. **FastText** (Gensim)
-5. **Transformer** (`paraphrase-multilingual-MiniLM-L12-v2`)
+## Options personnalisées
+
+Pour personnaliser les paramètres interactivement:
+
+```bash
+python run.py --mode custom
+```
+
+Pour spécifier directement les paramètres:
+
+```bash
+python main.py --min_samples 5 --top_classes 10 --vectorizers bow --classifier svm
+```
+
+## Structure du projet
+
+- `main.py`: Script principal pour la tokenisation et classification
+- `run.py`: Interface simplifiée pour lancer le projet
+- `analyze_dataset.py`: Utilitaire pour analyser la distribution des classes
+- `utils/`: Dossier contenant les modules utilitaires
+  - `tokenizer.py`: Implémentation du tokenizer BPE
+  - `data_loader.py`: Chargement des données et extraction des métadonnées
+  - `vectorizers.py`: Différentes méthodes de vectorisation de texte
+  - `models.py`: Modèles de classification et évaluation
+
+## Fonctionnalités
+
+- **Tokenisation BPE**: Apprentissage de sous-mots spécifiques au corpus
+- **Vectorisation**: Plusieurs méthodes (BOW, TF-IDF, Word2Vec, FastText, Transformer)
+- **Classification**: Différents algorithmes (Régression logistique, SVM, Random Forest)
+- **Analyse de données**: Outils pour comprendre la distribution des classes
+- **Évaluation**: Matrices de confusion, F1-score, précision, validation croisée
+
+## Résultats
+
+Les meilleurs résultats ont été obtenus avec:
+- Vectorisation: Bag-of-Words (BOW)
+- Classification: Régression logistique avec équilibrage des classes
+- Précision: ~60% sur la classification des 15 artistes les plus fréquents
+
+## Améliorations possibles
+
+- Augmentation des données pour les classes sous-représentées
+- Extraction de caractéristiques spécifiques aux paroles (rimes, structure)
+- Modèles plus complexes comme BERT fine-tuné sur le français
+- Approche hiérarchique (classification par genre puis par artiste)
