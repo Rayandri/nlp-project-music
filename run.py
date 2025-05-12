@@ -269,13 +269,26 @@ def run_interpretation(texts, labels, args):
         print("\nAnalyse de l'importance des features (permutation):")
         start_perm = time.time()
         try:
-            # Limiter à un sous-ensemble pour accélérer (par exemple, 30% des données)
-            sample_size = min(1000, int(X.shape[0] * 0.3))
-            indices = np.random.choice(X.shape[0], sample_size, replace=False)
+            # Utiliser un sous-ensemble plus petit pour accélérer tout en gardant assez d'exemples
+            sample_size = min(500, int(X.shape[0] * 0.25))
+            
+            # Assurer une représentation équilibrée des classes si possible
+            try:
+                from sklearn.model_selection import StratifiedShuffleSplit
+                
+                # Utiliser un échantillonnage stratifié pour préserver la distribution des classes
+                splitter = StratifiedShuffleSplit(n_splits=1, train_size=sample_size, random_state=args.random_seed)
+                for train_idx, _ in splitter.split(X, labels):
+                    indices = train_idx
+                    break
+            except:
+                # En cas d'échec, utiliser l'échantillonnage simple
+                indices = np.random.choice(X.shape[0], sample_size, replace=False)
+                
             X_sample = X[indices]
             y_sample = [labels[i] for i in indices]
             
-            print(f"Running permutation importance on {sample_size} samples...")
+            print(f"Running permutation importance on {sample_size} samples (classes: {len(set(y_sample))})...")
             perm_features = interpreter.permutation_feature_importance(X_sample, y_sample, n_repeats=5)
             
             if perm_features:

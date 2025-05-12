@@ -15,8 +15,9 @@ import eli5
 from eli5.sklearn import PermutationImportance
 from collections import defaultdict
 from wordcloud import WordCloud
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_backend
 import time
+import os
 
 class ModelInterpreter:
     """Classe pour interpréter les modèles de classification de texte"""
@@ -308,10 +309,19 @@ class ModelInterpreter:
     
     def permutation_feature_importance(self, X, y, n_repeats: int = 10, random_state: int = 42):
         """Calcule l'importance des features par permutation"""
+        import time
+        from sklearn.inspection import permutation_importance
+        
         start_time = time.time()
         
-        # Réduire le nombre de features si trop grand
-        max_features = 5000  # Limiter le nombre de features pour accélérer
+        # Récupérer les configurations de parallélisation de l'environnement
+        n_jobs = int(os.environ.get('JOBLIB_THREADS', -1))
+        
+        # Optimisation 1: Réduire le nombre de features mais pas trop pour préserver la qualité
+        # Un choix plus équilibré pour éviter de perdre trop d'information
+        max_features = 2500
+        
+        # Récupérer les noms des features
         if hasattr(self.vectorizer, 'get_feature_names_out'):
             feature_names = self.vectorizer.get_feature_names_out()
         else:
@@ -319,7 +329,7 @@ class ModelInterpreter:
             
         print(f"Total features: {len(feature_names)}")
         
-        # Si le nombre de features est très élevé, sélectionnez les plus importantes
+        # Optimisation 2: Sélectionner intelligemment les features
         if X.shape[1] > max_features and hasattr(self.model, "coef_"):
             print(f"Selecting top {max_features} features based on model coefficients")
             coefs = np.abs(self.model.coef_)
@@ -334,30 +344,49 @@ class ModelInterpreter:
             X = X_reduced
             feature_names = selected_feature_names
         
-        # Utiliser joblib pour paralléliser le calcul
-        print(f"Running permutation importance with {n_repeats} repeats...")
+        # Optimisation 3: Ajuster le nombre de répétitions pour un bon équilibre
+        # 4 est un bon compromis entre vitesse et robustesse statistique
+        actual_repeats = min(n_repeats, 4)
+        print(f"Running permutation importance with {actual_repeats} repeats using {n_jobs} CPU threads...")
+        
         start_perm = time.time()
         
-        # Calculer l'importance par permutation avec n_jobs=-1 (utiliser tous les cœurs)
-        perm_importance = permutation_importance(
-            self.model, X, y, 
-            n_repeats=n_repeats,
-            random_state=random_state,
-            n_jobs=-1  # Utiliser tous les cœurs disponibles
-        )
-        
-        print(f"Permutation calculation took {time.time() - start_perm:.2f} seconds")
-        
-        # Récupérer les moyennes
-        importances = perm_importance.importances_mean
-        
-        # Associer aux noms des features
-        feature_importance = dict(zip(feature_names, importances))
-        sorted_importance = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
-        
-        print(f"Total permutation importance calculation took {time.time() - start_time:.2f} seconds")
-        
-        return sorted_importance
+        # Optimisation 4: Parallélisation du calcul avec gestion d'erreur
+        try:
+            # Optimiser les paramètres pour la parallélisation
+            from joblib import parallel_backend
+            
+            # Utiliser le backend threading qui est plus efficace pour les opérations vectorielles
+            with parallel_backend('threading', n_jobs=n_jobs):
+                perm_importance = permutation_importance(
+                    self.model, X, y, 
+                    n_repeats=actual_repeats,
+                    random_state=random_state,
+                    scoring='accuracy'  # Spécifier le score pour accélérer
+                )
+            
+            # Récupérer les moyennes des importances
+            importances = perm_importance.importances_mean
+            
+            print(f"Permutation calculation completed in {time.time() - start_perm:.2f} seconds")
+            
+            # Associer aux noms des features
+            feature_importance = dict(zip(feature_names, importances))
+            sorted_importance = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
+            
+            print(f"Total permutation importance calculation took {time.time() - start_time:.2f} seconds")
+            
+            return sorted_importance
+            
+        except Exception as e:
+            print(f"Permutation calculation error: {str(e)}")
+            print("Falling back to coefficient-based importance")
+            
+            # En cas d'erreur, utiliser l'importance basée sur les coefficients
+            if hasattr(self.model, "coef_"):
+                return self._get_coefficient_importance()
+            else:
+                return []
     
     def compare_feature_importance_methods(self, X, y, n_repeats: int = 5):
         """Compare différentes méthodes d'importance des features"""

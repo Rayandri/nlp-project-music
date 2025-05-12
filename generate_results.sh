@@ -3,6 +3,9 @@
 # Script pour générer toutes les données nécessaires au rapport de projet NLP
 # Execution: bash generate_results.sh
 
+export OPENBLAS_NUM_THREADS=32
+export MKL_NUM_THREADS=32
+
 # Création des répertoires pour les résultats
 RESULTS_DIR="results_rapport"
 FIGURES_DIR="figures_rapport"
