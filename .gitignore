@@ -175,3 +175,4 @@ cython_debug/
 tokenized_lyrics_dataset/
 
 *.pkl
+results/
