@@ -18,14 +18,12 @@ echo "Utilisation maximale: $TOTAL_THREADS threads pour tous les calculs"
 
 # Création des répertoires pour les résultats
 RESULTS_DIR="results_rapport"
-FIGURES_DIR="figures_rapport"
+
 
 mkdir -p $RESULTS_DIR
-mkdir -p $FIGURES_DIR
 
 echo "=== Génération des données pour le rapport ==="
 echo "Résultats sauvegardés dans: $RESULTS_DIR"
-echo "Figures sauvegardées dans: $FIGURES_DIR"
 
 # Activation de l'environnement virtuel (décommenter si nécessaire)
 # source venv/bin/activate
