@@ -156,6 +156,30 @@ Ces résultats montrent clairement que la méthode TF-IDF surpasse les autres ap
     \label{fig:embedding-comparison}
 \end{figure}
 
+\subsection{Interface web de démonstration}
+Afin de permettre une utilisation facile de notre modèle de classification, nous avons développé une interface web simple permettant aux utilisateurs de saisir des paroles et d'obtenir une prédiction de l'artiste correspondant.
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{results_rapport/jul.png}
+        \caption{Détection correcte de l'artiste Jul avec une confiance de 71,8\%}
+        \label{fig:jul-detection}
+    \end{subfigure}
+    \vspace{0.5cm}
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{results_rapport/plk.png}
+        \caption{Détection correcte de l'artiste PLK avec une confiance de 82,6\%}
+        \label{fig:plk-detection}
+    \end{subfigure}
+    \caption{Exemples de prédictions réalisées avec notre interface web}
+    \label{fig:web-interface}
+\end{figure}
+
+L'interface affiche non seulement l'artiste prédit mais également les probabilités associées aux 5 artistes les plus probables, ce qui permet d'évaluer la confiance du modèle dans sa prédiction. Comme nous pouvons le voir sur les figures \ref{fig:jul-detection} et \ref{fig:plk-detection}, le modèle est capable d'identifier correctement les artistes avec une forte confiance pour des extraits de paroles typiques.
+
 \section{Modèles de génération de texte}
 \label{sec:generation}
 
