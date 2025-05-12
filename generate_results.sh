@@ -3,8 +3,19 @@
 # Script pour générer toutes les données nécessaires au rapport de projet NLP
 # Execution: bash generate_results.sh
 
-export OPENBLAS_NUM_THREADS=32
-export MKL_NUM_THREADS=32
+# Détection automatique du nombre de threads disponibles
+TOTAL_THREADS=$(nproc)
+PHYSICAL_CORES=$((TOTAL_THREADS / 2)) # Estimation pour CPU hyperthreadé
+
+# Configuration pour optimiser la parallélisation
+export OPENBLAS_NUM_THREADS=$PHYSICAL_CORES
+export MKL_NUM_THREADS=$PHYSICAL_CORES
+export OMP_NUM_THREADS=$PHYSICAL_CORES
+export PYTHONPATH=.
+export JOBLIB_TEMP_FOLDER=/tmp
+export JOBLIB_THREADS=$TOTAL_THREADS
+
+echo "Détection: $TOTAL_THREADS threads total, utilisation de $PHYSICAL_CORES threads pour calculs numériques"
 
 # Création des répertoires pour les résultats
 RESULTS_DIR="results_rapport"
@@ -46,13 +57,29 @@ if [ -d "lyrics_dataset2" ]; then
     python run.py --mode cross_validate --dataset_dirs lyrics_dataset lyrics_dataset2 --output_dir $RESULTS_DIR
 fi
 
-# 7. Génération de figures supplémentaires (optionnel)
-echo -e "\n=== 7. Génération de figures supplémentaires ==="
-if [ -f "$RESULTS_DIR/classification_results.npy" ]; then
-    # Script pour générer des graphiques à partir des résultats (confusion matrices, etc.)
-    # python visualize_results.py --input_dir $RESULTS_DIR --output_dir $FIGURES_DIR
-    echo "Figures générées dans: $FIGURES_DIR"
-fi
+# 7. Génération de résumé global des résultats
+echo -e "\n=== 7. Génération du résumé global ==="
+{
+    echo "=== RÉSUMÉ GLOBAL DES RÉSULTATS ==="
+    echo "Date: $(date)"
+    echo ""
+    echo "=== Classification ==="
+    [ -f "$RESULTS_DIR/classification_summary.txt" ] && cat "$RESULTS_DIR/classification_summary.txt" | grep "Meilleure méthode\|Précision\|F1-score" || echo "Résultats de classification non disponibles"
+    echo ""
+    echo "=== Génération ==="
+    [ -f "$RESULTS_DIR/generation_summary.txt" ] && head -n 10 "$RESULTS_DIR/generation_summary.txt" || echo "Résultats de génération non disponibles"
+    echo ""
+    echo "=== Augmentation ==="
+    [ -f "$RESULTS_DIR/augmentation_summary.txt" ] && grep "Amélioration" "$RESULTS_DIR/augmentation_summary.txt" || echo "Résultats d'augmentation non disponibles"
+    echo ""
+    echo "=== Interprétation ==="
+    [ -f "$RESULTS_DIR/interpretation_summary.txt" ] && grep -A 5 "Importance des features" "$RESULTS_DIR/interpretation_summary.txt" | head -n 10 || echo "Résultats d'interprétation non disponibles"
+    echo ""
+    echo "=== VISUALISATIONS GÉNÉRÉES ==="
+    find "$RESULTS_DIR" -name "*.png" | sort
+} > "$RESULTS_DIR/resume_global.txt"
+
+echo "Résumé global généré: $RESULTS_DIR/resume_global.txt"
 
 echo -e "\n=== Terminé! Toutes les données ont été générées ==="
 echo "Les résultats sont prêts pour être inclus dans le rapport LaTeX." 

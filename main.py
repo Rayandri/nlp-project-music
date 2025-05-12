@@ -250,18 +250,51 @@ def main():
                 y_pred_filtered = [y_pred[i] for i in indices]
                 cm = confusion_matrix(y_test_filtered, y_pred_filtered)
             
-            plot_confusion_matrix(cm, classes, title=f"Matrice de confusion pour {best_method}")
-            plt.savefig(f"confusion_matrix_{best_method}.png")
-            print(f"Matrice de confusion sauvegardée: confusion_matrix_{best_method}.png")
+            # Créer le répertoire de sortie pour les résultats
+            results_dir = "results_rapport"
+            os.makedirs(results_dir, exist_ok=True)
+            
+            # Sauvegarder la matrice de confusion
+            plot_confusion_matrix(cm, classes, title=f"Matrice de confusion - {best_method}", 
+                                 output_dir=results_dir)
+            
+            # Créer un résumé des résultats
+            summary_file = os.path.join(results_dir, "main_classification_summary.txt")
+            with open(summary_file, 'w') as f:
+                f.write("=== RÉSULTATS DE CLASSIFICATION (main.py) ===\n\n")
+                f.write(f"Meilleure méthode: {best_method}\n")
+                f.write(f"Précision: {best_accuracy:.4f}\n")
+                f.write(f"F1-score macro: {results[best_method]['classification_report']['macro avg']['f1-score']:.4f}\n")
+                f.write(f"F1-score pondéré: {results[best_method]['classification_report']['weighted avg']['f1-score']:.4f}\n")
+                f.write(f"Nombre de classes: {len(set(labels))}\n")
+                f.write(f"Nombre d'échantillons: {len(texts)}\n\n")
+                
+                # Ajouter les détails de chaque méthode
+                f.write("=== Détails par méthode ===\n")
+                for method, res in results.items():
+                    f.write(f"\nMéthode: {method}\n")
+                    f.write(f"Précision: {res['accuracy']:.4f}\n")
+                    f.write(f"F1-score macro: {res['classification_report']['macro avg']['f1-score']:.4f}\n")
+                
+            print(f"Résumé des résultats sauvegardé: {summary_file}")
             
             # Afficher les résultats finaux
             print("\n=== RÉSULTATS FINAUX ===")
             print(f"Meilleure méthode: {best_method}")
             print(f"Précision: {best_accuracy:.3f}")
-            print(f"F1-score macro: {report['macro avg']['f1-score']:.3f}")
+            print(f"F1-score macro: {results[best_method]['classification_report']['macro avg']['f1-score']:.3f}")
             print(f"Nombre de classes: {len(set(labels))}")
             print(f"Nombre d'échantillons: {len(texts)}")
             print("--------------------------------------------------")
+        
+        # Évaluer toutes les méthodes sur un graphique de comparaison
+        if len(results) > 1:
+            # Créer le répertoire si nécessaire
+            results_dir = "results_rapport"
+            os.makedirs(results_dir, exist_ok=True)
+            
+            # Évaluer avec la fonction améliorée
+            evaluate_multiple_embeddings(results, output_dir=results_dir)
         
         # Sauvegarder les modèles si demandé
         if args.save_models and best_vectorizer and best_classifier:
