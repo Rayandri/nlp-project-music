@@ -135,10 +135,23 @@ def run_classification(texts, labels, args):
     results = {}
     best_accuracy = 0
     best_method = None
+    best_vectorizer = None
+    best_classifier = None
     
     for method in args.vectorizers:
         print(f"\nMéthode de vectorisation: {method}")
-        vectorizer = TextVectorizer(method=method)
+        
+        # Options de vectorisation pour limiter l'utilisation de la mémoire
+        vectorizer_opts = {}
+        if method in ["tfidf", "bow"]:
+            # Limiter le nombre de features et réduire la mémoire utilisée
+            vectorizer_opts = {
+                "max_features": 10000,  # Limiter à 10000 features au lieu de toutes
+                "min_df": 2,            # Ignorer les mots qui apparaissent dans moins de 2 documents
+                "max_df": 0.9           # Ignorer les mots qui apparaissent dans plus de 90% des documents
+            }
+        
+        vectorizer = TextVectorizer(method=method, **vectorizer_opts)
         X = vectorizer.fit_transform(texts)
         print(f"Dimensions des vecteurs: {X.shape}")
         
@@ -158,10 +171,26 @@ def run_classification(texts, labels, args):
         
         results[method] = eval_results
         
+        try:
+            # Sauvegarder le modèle et le vectorizer
+            print(f"\nSauvegarde du modèle {method}_{args.classifier}_{args.label}...")
+            models_dir = os.path.join(args.output_dir, "models")
+            os.makedirs(models_dir, exist_ok=True)
+            print(f"Répertoire des modèles: {models_dir}")
+            model_path = os.path.join(models_dir, f"{method}_{args.classifier}_{args.label}.pkl")
+            print(f"Chemin complet du modèle: {model_path}")
+            print(f"Le modèle est-il valide: {classifier.model is not None}")
+            classifier.save_model(model_path, vectorizer)
+            print(f"Modèle et vectorizeur sauvegardés dans: {model_path}")
+        except Exception as e:
+            print(f"ERREUR lors de la sauvegarde du modèle: {str(e)}")
+        
         # Tracker la meilleure méthode
         if accuracy > best_accuracy:
             best_accuracy = accuracy
             best_method = method
+            best_vectorizer = vectorizer
+            best_classifier = classifier
             
         # Sauvegarder la matrice de confusion pour chaque méthode
         y_test = eval_results["y_test"]
@@ -178,6 +207,12 @@ def run_classification(texts, labels, args):
         # Sauvegarder la matrice de confusion
         title = f"Confusion Matrix - {method}"
         plot_confusion_matrix(cm, classes, title=title, output_dir=args.output_dir)
+    
+    # Sauvegarder le meilleur modèle séparément
+    if best_classifier and best_vectorizer:
+        best_model_path = os.path.join(models_dir, f"best_{args.label}.pkl")
+        best_classifier.save_model(best_model_path, best_vectorizer)
+        print(f"Meilleur modèle sauvegardé dans: {best_model_path}")
     
     if len(results) > 1:
         print("\n=== Comparaison des méthodes de vectorisation ===")

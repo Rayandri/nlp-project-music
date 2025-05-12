@@ -1,116 +1,116 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Script pour prédire le label d'un texte (artiste, genre, etc.)
+"""
 
 import os
 import sys
 import argparse
-import pickle
 import numpy as np
-from pathlib import Path
-
-from utils.tokenizer import BPETokenizer
-from utils.vectorizers import TextVectorizer
 from utils.models import TextClassifier
-
-MODEL_DIR = "models"
-TOKENIZER_PATH = os.path.join(MODEL_DIR, "tokenizer.pkl")
-VECTORIZER_PATH = os.path.join(MODEL_DIR, "vectorizer.pkl")
-CLASSIFIER_PATH = os.path.join(MODEL_DIR, "classifier.pkl")
-LABELS_PATH = os.path.join(MODEL_DIR, "labels.pkl")
+from utils.vectorizers import TextVectorizer
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Prédire l'artiste d'une chanson")
+    parser = argparse.ArgumentParser(description="Prédiction de labels pour les paroles de chansons")
     
+    # Source du texte
     input_group = parser.add_mutually_exclusive_group(required=True)
-    input_group.add_argument("--text", type=str, help="Texte des paroles")
-    input_group.add_argument("--file", type=str, help="Fichier contenant les paroles")
+    input_group.add_argument("--text", type=str, help="Texte à classifier")
+    input_group.add_argument("--file", type=str, help="Fichier texte à classifier")
     
-    parser.add_argument("--train", action="store_true", help="Forcer le réentraînement du modèle")
+    # Paramètres du modèle
+    parser.add_argument("--model", type=str, default="results/models/best_artiste.pkl", 
+                       help="Chemin vers le modèle préentrainé (fichier .pkl)")
+    parser.add_argument("--label", type=str, 
+                       choices=["artiste", "album", "genre", "année"], 
+                       default="artiste",
+                       help="Type de label à prédire")
+    
     return parser.parse_args()
 
-def check_models_exist():
-    return (os.path.exists(TOKENIZER_PATH) and 
-            os.path.exists(VECTORIZER_PATH) and 
-            os.path.exists(CLASSIFIER_PATH) and
-            os.path.exists(LABELS_PATH))
-
-def train_models():
-    import subprocess
-    from pathlib import Path
-    
-    Path(MODEL_DIR).mkdir(exist_ok=True)
-    
-    print("Entraînement des modèles...")
-    subprocess.run(["python", "main.py", "--mode", "best", "--save_models", MODEL_DIR])
-
-def load_models():
-    with open(TOKENIZER_PATH, 'rb') as f:
-        tokenizer = pickle.load(f)
-        
-    with open(VECTORIZER_PATH, 'rb') as f:
-        vectorizer = pickle.load(f)
-        
-    with open(CLASSIFIER_PATH, 'rb') as f:
-        classifier = pickle.load(f)
-        
-    with open(LABELS_PATH, 'rb') as f:
-        labels_map = pickle.load(f)
-        
-    return tokenizer, vectorizer, classifier, labels_map
-
-def predict_artist(text, tokenizer, vectorizer, classifier, labels_map):
-    tokenized_text = tokenizer(text)
-    X = vectorizer.transform([' '.join(tokenized_text)])
-    y_pred = classifier.predict(X)
-    
-    if hasattr(classifier.model, 'predict_proba'):
-        proba = classifier.model.predict_proba(X)[0]
-        class_indices = classifier.model.classes_
-        
-        scores = [(labels_map[idx], prob) for idx, prob in zip(class_indices, proba)]
-        scores.sort(key=lambda x: x[1], reverse=True)
-        
-        return y_pred[0], scores[:5]
-    
-    return y_pred[0], []
+def load_text(args):
+    """Charge le texte à classifier"""
+    if args.text:
+        return args.text
+    elif args.file:
+        try:
+            with open(args.file, 'r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            print(f"Erreur lors de la lecture du fichier: {str(e)}")
+            sys.exit(1)
+    return None
 
 def main():
     args = parse_args()
     
-    if args.text:
-        lyrics = args.text
-    else:
-        try:
-            with open(args.file, 'r', encoding='utf-8') as f:
-                lyrics = f.read()
-        except Exception as e:
-            print(f"Erreur lors de la lecture du fichier: {e}")
-            return 1
+    # Charger le texte
+    text = load_text(args)
+    if not text:
+        print("Erreur: Aucun texte à classifier")
+        return
     
-    if not check_models_exist() or args.train:
-        train_models()
+    print(f"\n=== Classification de paroles ({args.label}) ===")
     
+    # Vérifier si le modèle existe
+    if not os.path.exists(args.model):
+        print(f"Erreur: Le modèle {args.model} n'existe pas.")
+        return
+    
+    # Charger le modèle pré-entraîné
     try:
-        tokenizer, vectorizer, classifier, labels_map = load_models()
-    except Exception as e:
-        print(f"Erreur lors du chargement des modèles: {e}")
-        print("Essayez d'exécuter avec l'option --train pour forcer le réentraînement")
-        return 1
-    
-    try:
-        artist, scores = predict_artist(lyrics, tokenizer, vectorizer, classifier, labels_map)
+        print(f"Chargement du modèle: {args.model}")
+        classifier, vectorizer = TextClassifier.load_model(args.model)
         
-        print("\n=== Résultat ===")
-        print(f"Artiste prédit: {artist}")
-        
-        if scores:
-            print("\nProbabilités:")
-            for name, prob in scores:
-                print(f"  {name}: {prob*100:.1f}%")
-    except Exception as e:
-        print(f"Erreur lors de la prédiction: {e}")
-        return 1
+        # Si le vectoriseur n'est pas inclus dans le fichier, créer un nouveau
+        if vectorizer is None:
+            print("Attention: Vectoriseur non trouvé dans le fichier modèle.")
+            print("Création d'un vectoriseur TF-IDF par défaut.")
+            vectorizer = TextVectorizer(method="tfidf")
+            # Dans ce cas, il faudrait réentraîner le vectoriseur sur les données d'origine
+            # ce qui n'est pas possible ici, donc les résultats seront probablement mauvais
     
-    return 0
+        # Vectoriser le texte
+        X = vectorizer.transform([text])
+        
+        # Prédire le label
+        prediction = classifier.predict(X)[0]
+        
+        # Afficher la prédiction
+        print(f"\nTexte analysé: {text[:100]}...")
+        print(f"\nPrédiction: {prediction}")
+        
+        # Si le modèle a des probabilités, les afficher
+        if hasattr(classifier.model, "predict_proba"):
+            try:
+                probs = classifier.model.predict_proba(X)[0]
+                classes = classifier.model.classes_
+                
+                # Trier par probabilité décroissante
+                sorted_indices = np.argsort(probs)[::-1]
+                
+                # Format joli pour l'affichage
+                print("\nTop 5 probabilités:")
+                for i in range(min(5, len(classes))):
+                    idx = sorted_indices[i]
+                    print(f"  {classes[idx]}: {probs[idx]:.3f} ({probs[idx]*100:.1f}%)")
+                
+                # Afficher un résumé coloré (ASCII art simple)
+                print("\nRésultat final:")
+                prediction_prob = probs[list(classes).index(prediction)]
+                confidence = "Haute" if prediction_prob > 0.6 else "Moyenne" if prediction_prob > 0.3 else "Basse"
+                print("┌" + "─" * 50 + "┐")
+                print(f"│ {args.label.upper()}: {prediction:<43} │")
+                print(f"│ Confiance: {confidence:<40} │")
+                print(f"│ Probabilité: {prediction_prob*100:.1f}%{' ':<35} │")
+                print("└" + "─" * 50 + "┘")
+            except Exception as e:
+                print(f"Erreur lors du calcul des probabilités: {str(e)}")
+    
+    except Exception as e:
+        print(f"Erreur lors de la prédiction: {str(e)}")
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    main() 

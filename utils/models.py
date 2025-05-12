@@ -10,6 +10,7 @@ import seaborn as sns
 from collections import Counter
 import time
 import os
+import pickle
 
 class TextClassifier:
     def __init__(self, model_type: str = "logistic", **kwargs):
@@ -105,6 +106,38 @@ class TextClassifier:
             raise ValueError("Model not trained. Call train() first.")
         
         return self.model.predict(X)
+    
+    def save_model(self, path: str, vectorizer=None) -> None:
+        """Sauvegarde le modèle et éventuellement le vectorizeur dans un fichier pickle"""
+        if self.model is None:
+            raise ValueError("Model not trained. Call train() first.")
+        
+        # Créer le dossier si nécessaire
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        
+        # Sauvegarder tout dans un dictionnaire
+        data = {
+            'model': self.model,
+            'model_type': self.model_type,
+            'vectorizer': vectorizer
+        }
+        
+        with open(path, 'wb') as f:
+            pickle.dump(data, f)
+        
+        print(f"Modèle et vectorizeur sauvegardés dans: {path}")
+    
+    @staticmethod
+    def load_model(path: str) -> Tuple[Any, Any]:
+        """Charge un modèle et son vectorizeur depuis un fichier pickle"""
+        with open(path, 'rb') as f:
+            data = pickle.load(f)
+        
+        # Créer une nouvelle instance
+        classifier = TextClassifier(model_type=data['model_type'])
+        classifier.model = data['model']
+        
+        return classifier, data.get('vectorizer')
 
 def plot_confusion_matrix(cm: np.ndarray, labels: List[str], 
                          title: str = "Confusion Matrix", 
