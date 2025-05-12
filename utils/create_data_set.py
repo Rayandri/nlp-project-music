@@ -167,7 +167,7 @@ ARTISTS = [
     ("Rap", "Mister You"), ("Rap", "Youssoupha"), ("Rap", "Disiz"),
     ("Rap", "Lino"), ("Rap", "Oxmo Puccino"), ("Rap", "Chilla"),
     ("Rap", "Alkpote"), ("Rap", "La Fouine"), ("Rap", "Timal"),
-    ("Rap", "Zed"), ("Rap", "Kikesa"), ("Rap", "Hös Copperfield")
+    ("Rap", "Zed"), ("Rap", "Kikesa"), ("Rap", "Hös Copperfield"),
 
     # ---------- Pop française ----------
     ("Pop française", "Angèle"), ("Pop française", "Aya Nakamura"),
