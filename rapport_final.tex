@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
-\usepackage[margin=0.5in, top=0.25in, bottom=0.2in, headheight=5pt, footskip=5pt]{geometry}
+\usepackage[margin=0.5in, top=0.5in, bottom=0.2in, headheight=5pt, footskip=5pt]{geometry}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -83,7 +83,7 @@ Les artistes les plus représentés sont Jul (191 chansons), Kaaris (140 chanson
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{dataset_analysis.png}
+    \includegraphics[width=0.6\textwidth]{dataset_analysis.png}
     \caption{Distribution du nombre de chansons par artiste pour les artistes les plus représentés}
     \label{fig:artist-distribution}
 \end{figure}
@@ -192,7 +192,7 @@ Ces résultats montrent clairement que la méthode TF-IDF surpasse les autres ap
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{results_rapport/embedding_accuracy_comparison.png}
+    \includegraphics[width=0.6\textwidth]{results_rapport/embedding_accuracy_comparison.png}
     \caption{Comparaison des performances des différentes méthodes de vectorisation}
     \label{fig:embedding-comparison}
 \end{figure}
@@ -204,14 +204,14 @@ Afin de permettre une utilisation facile de notre modèle de classification, nou
     \centering
     \begin{subfigure}[b]{0.8\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{results_rapport/jul_fixed.png}
+        \includegraphics[width=0.7\textwidth]{results_rapport/jul_fixed.png}
         \caption{Détection correcte de l'artiste Jul avec une confiance de 71,8\%}
         \label{fig:jul-detection}
     \end{subfigure}
     \vspace{0.5cm}
     \begin{subfigure}[b]{0.8\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{results_rapport/plk_fixed.png}
+        \includegraphics[width=0.7\textwidth]{results_rapport/plk_fixed.png}
         \caption{Détection correcte de l'artiste PLK avec une confiance de 82,6\%}
         \label{fig:plk-detection}
     \end{subfigure}
@@ -312,14 +312,14 @@ Nous observons une amélioration significative des performances avec l'augmentat
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{results_rapport/augmentation_impact.png}
+    \includegraphics[width=0.6\textwidth]{results_rapport/augmentation_impact.png}
     \caption{Impact de l'augmentation de données sur les performances de classification}
     \label{fig:augmentation-impact}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{results_rapport/dataset_size_vs_performance.png}
+    \includegraphics[width=0.6\textwidth]{results_rapport/dataset_size_vs_performance.png}
     \caption{Relation entre la taille du dataset et les performances}
     \label{fig:dataset-size-vs-performance}
 \end{figure}
@@ -336,7 +336,7 @@ Les tokens les plus importants selon l'analyse des coefficients sont : "je" (0.4
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{results_rapport/feature_importance_wordcloud.png}
+    \includegraphics[width=0.6\textwidth]{results_rapport/feature_importance_wordcloud.png}
     \caption{Nuage de mots représentant l'importance des features}
     \label{fig:feature-importance}
 \end{figure}
@@ -348,7 +348,7 @@ Nous observons un fort chevauchement entre les features identifiées comme impor
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.8\textwidth]{results_rapport/permutation_importance.png}
+    \includegraphics[width=0.6\textwidth]{results_rapport/permutation_importance.png}
     \caption{Importance des features par permutation}
     \label{fig:permutation-importance}
 \end{figure}
