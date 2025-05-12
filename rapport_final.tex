@@ -81,7 +81,7 @@ Notre corpus est constitué de paroles de chansons françaises contemporaines et
 
 Les artistes les plus représentés sont Jul (191 chansons), Kaaris (140 chansons), Booba (139 chansons), Naps (138 chansons) et IAM (130 chansons). Cette distribution déséquilibrée représente un défi particulier pour les tâches de classification.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{dataset_analysis.png}
     \caption{Distribution du nombre de chansons par artiste pour les artistes les plus représentés}
@@ -190,7 +190,7 @@ Transformer & 0.2120 & 0.1517 & 0.2126 \\
 
 Ces résultats montrent clairement que la méthode TF-IDF surpasse les autres approches pour cette tâche spécifique, avec une précision de 42,93\% et un F1-score macro de 32,11\%. Les approches basées sur les embeddings (Word2Vec, FastText, Transformer) affichent des performances inférieures, ce qui peut s'expliquer par la taille limitée du corpus et la forte spécificité du vocabulaire des paroles.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{results_rapport/embedding_accuracy_comparison.png}
     \caption{Comparaison des performances des différentes méthodes de vectorisation}
@@ -200,7 +200,7 @@ Ces résultats montrent clairement que la méthode TF-IDF surpasse les autres ap
 \subsection{Interface web de démonstration}
 Afin de permettre une utilisation facile de notre modèle de classification, nous avons développé une interface web simple permettant aux utilisateurs de saisir des paroles et d'obtenir une prédiction de l'artiste correspondant.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.8\textwidth}
         \centering
@@ -310,14 +310,14 @@ Aug. facteur 1.0 & 0.3936 & 0.2874 & 3156 \\
 
 Nous observons une amélioration significative des performances avec l'augmentation des données, atteignant jusqu'à 10,34\% d'amélioration avec un facteur d'augmentation de 1.0. Cette amélioration est particulièrement notable pour le F1-score, qui passe de 0,1689 à 0,2874, indiquant une meilleure gestion des classes minoritaires.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{results_rapport/augmentation_impact.png}
     \caption{Impact de l'augmentation de données sur les performances de classification}
     \label{fig:augmentation-impact}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{results_rapport/dataset_size_vs_performance.png}
     \caption{Relation entre la taille du dataset et les performances}
@@ -334,7 +334,7 @@ Nous avons analysé les coefficients des modèles de régression logistique pour
 
 Les tokens les plus importants selon l'analyse des coefficients sont : "je" (0.4815), "la" (0.4790), "de" (0.4590), "the" (0.4459), et "you" (0.4083). Il est intéressant de noter la présence de mots anglais parmi les tokens les plus importants, ce qui reflète leur usage fréquent dans certains styles musicaux comme le rap.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{results_rapport/feature_importance_wordcloud.png}
     \caption{Nuage de mots représentant l'importance des features}
@@ -346,7 +346,7 @@ Nous avons également utilisé l'importance par permutation pour évaluer l'impa
 
 Nous observons un fort chevauchement entre les features identifiées comme importantes par l'analyse des coefficients et par l'importance par permutation, avec 20 features communes dans le top 20, ce qui renforce la fiabilité de notre analyse.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{results_rapport/permutation_importance.png}
     \caption{Importance des features par permutation}
