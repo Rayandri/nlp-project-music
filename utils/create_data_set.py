@@ -165,20 +165,42 @@ def mb_artist_id(name):
 
 
 def mb_top_albums(artist_id):
-    js = requests.get("https://musicbrainz.org/ws/2/release-group",
-                      params={"artist": artist_id, "type": "album",
-                              "status": "official", "fmt": "json", "limit": 100},
-                      headers=MB_HEADERS, timeout=10).json()
-    rgs = js.get("release-groups", [])
-    rgs.sort(key=lambda x: x.get("first-release-date", ""), reverse=True)
-    albums = []
-    for rg in rgs[:SP_LIMIT]:
-        albums.append({"id": rg["id"],
-                       "title": rg["title"],
-                       "pop": 0,
-                       "year": (rg.get("first-release-date") or "0")[:4],
-                       "tracks": mb_tracks(rg["id"])})
-    return albums
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            r = requests.get("https://musicbrainz.org/ws/2/release-group",
+                            params={"artist": artist_id, "type": "album",
+                                    "status": "official", "fmt": "json", "limit": 100},
+                            headers=MB_HEADERS, timeout=10)
+            r.raise_for_status()
+            js = r.json()
+            rgs = js.get("release-groups", [])
+            rgs.sort(key=lambda x: x.get("first-release-date", ""), reverse=True)
+            
+            albums = []
+            for rg in rgs[:SP_LIMIT]:
+                try:
+                    albums.append({
+                        "id": rg["id"],
+                        "title": rg["title"],
+                        "pop": 0,
+                        "year": (rg.get("first-release-date") or "0")[:4],
+                        "tracks": mb_tracks(rg["id"])
+                    })
+                except (KeyError, Exception) as e:
+                    logging.error(f"Erreur lors du traitement du release group {rg.get('title', 'inconnu')}: {e}")
+                    continue
+                
+            return albums
+            
+        except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+            logging.error(f"Erreur lors de la récupération des albums MusicBrainz pour {artist_id} (tentative {attempt+1}/{max_attempts}): {e}")
+            if attempt < max_attempts - 1:
+                logging.info("Attente de 60 secondes avant nouvelle tentative...")
+                time.sleep(60)  # Wait 1 minute before retrying
+            else:
+                logging.error(f"Échec de la récupération des albums MusicBrainz pour {artist_id} après plusieurs tentatives")
+                return []
 
 
 def mb_tracks(rgid):
@@ -196,6 +218,20 @@ def mb_tracks(rgid):
     for m in det.get("media", []):
         tracks.extend([t["title"] for t in m.get("tracks", [])])
     return tracks
+
+# ---------- lyrics ----------
+
+
+def lyrics(artist, title):
+    r = requests.get(
+        f"https://api.lyrics.ovh/v1/{urllib.parse.quote(artist)}/{urllib.parse.quote(title)}", timeout=10)
+    if r.status_code != 200:
+        return None
+    return r.json().get("lyrics")
+
+
+# ---------- collecte ----------
+ARTISTS = [
     # ---------- Rap ----------
     ("Rap", "Booba"), ("Rap", "PNL"), ("Rap", "Orelsan"),
     ("Rap", "Damso"), ("Rap", "Ninho"), ("Rap", "SCH"),
