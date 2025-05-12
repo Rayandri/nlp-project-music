@@ -60,6 +60,23 @@ class TextVectorizer:
         self.fit(documents)
         return self.transform(documents)
     
+    def get_feature_names_out(self) -> List[str]:
+        """Return feature names for the vectorizer"""
+        if self.method in ["bow", "tfidf"]:
+            return self.model.get_feature_names_out()
+        elif self.method in ["word2vec", "fasttext"]:
+            # For embedding models, feature names aren't directly available
+            # Return dimensions as feature names
+            return [f"dim_{i}" for i in range(self.vector_size)]
+        elif self.method == "transformer":
+            # For transformer models, feature names aren't available
+            # Return dimensions as feature names
+            dummy_text = "dummy text for encoding"
+            embeddings = self.model.encode([dummy_text])[0]
+            return [f"dim_{i}" for i in range(len(embeddings))]
+        else:
+            return []
+    
     def _document_vector(self, tokens: List[str]) -> np.ndarray:
         if self.method == "word2vec":
             valid_tokens = [token for token in tokens if token in self.model.wv.key_to_index]

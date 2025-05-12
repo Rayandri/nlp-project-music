@@ -43,25 +43,39 @@ class ModelInterpreter:
         if not self.vectorizer:
             raise ValueError("Vectorizer non fourni, impossible d'associer les features")
             
-        # Récupérer les coefficients
-        coefs = self.model.coef_
-        
-        feature_names = self.vectorizer.get_feature_names_out()
-        
-        # Pour la classification multiclasse
-        if coefs.shape[0] > 1:
-            # Moyenne des valeurs absolues des coefficients pour chaque feature
-            importances = np.abs(coefs).mean(axis=0)
-        else:
-            importances = np.abs(coefs[0])
+        try:
+            # Récupérer les coefficients
+            coefs = self.model.coef_
             
-        # Créer un dictionnaire feature -> importance
-        feature_importance = dict(zip(feature_names, importances))
-        
-        # Trier par importance décroissante
-        sorted_importance = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
-        
-        return sorted_importance
+            # Obtenir les noms des features
+            feature_names = self.vectorizer.get_feature_names_out()
+            
+            # Pour la classification multiclasse
+            if coefs.shape[0] > 1:
+                # Moyenne des valeurs absolues des coefficients pour chaque feature
+                importances = np.abs(coefs).mean(axis=0)
+            else:
+                importances = np.abs(coefs[0])
+                
+            # Vérifier les dimensions
+            if len(feature_names) != len(importances):
+                print(f"Attention: Nombre de features ({len(feature_names)}) différent du nombre de coefficients ({len(importances)})")
+                # Utiliser les dimensions disponibles
+                min_len = min(len(feature_names), len(importances))
+                feature_names = feature_names[:min_len]
+                importances = importances[:min_len]
+                
+            # Créer un dictionnaire feature -> importance
+            feature_importance = dict(zip(feature_names, importances))
+            
+            # Trier par importance décroissante
+            sorted_importance = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
+            
+            return sorted_importance
+        except Exception as e:
+            print(f"Erreur lors de l'extraction de l'importance des features: {str(e)}")
+            # Retourner une liste vide si erreur
+            return []
     
     def explain_prediction(self, text: str, num_features: int = 10):
         """Explique la prédiction pour un texte donné"""

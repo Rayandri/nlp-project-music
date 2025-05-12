@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from collections import Counter
 
 from utils.tokenizer import BPETokenizer
-from utils.data_loader import load_lyrics_dataset, save_tokenized_lyrics, get_label_from_metadata
+from utils.data_loader import load_lyrics_dataset, save_tokenized_lyrics, get_label_from_metadata, cross_dataset_validation
 from utils.vectorizers import TextVectorizer
 from utils.models import TextClassifier, evaluate_multiple_embeddings, plot_confusion_matrix
 from utils.text_generator import TextGenerator, benchmark_generation_models
@@ -25,13 +25,15 @@ def parse_args():
     
     # Mode principal
     parser.add_argument("--mode", type=str, 
-                       choices=["classify", "generate", "augment", "interpret", "all"],
+                       choices=["classify", "generate", "augment", "interpret", "cross_validate", "all"],
                        default="classify", 
                        help="Mode d'opération")
     
     # Chemins des données
     parser.add_argument("--input_dir", type=str, default="lyrics_dataset")
     parser.add_argument("--output_dir", type=str, default="results")
+    parser.add_argument("--dataset_dirs", type=str, nargs="+", 
+                       help="Répertoires des jeux de données pour la validation croisée")
     
     # Paramètres généraux
     parser.add_argument("--label", type=str, 
@@ -96,30 +98,35 @@ def main():
     # Créer le répertoire de sortie
     os.makedirs(args.output_dir, exist_ok=True)
     
-    print("\n=== Chargement des données ===")
-    texts, metadata_list = load_lyrics_dataset(args.input_dir)
-    print(f"Total chansons: {len(texts)}")
-    
-    # Récupérer les labels
-    labels = get_label_from_metadata(metadata_list, args.label)
-    print(f"{args.label}s uniques: {len(set(labels))}")
-    
-    # Afficher la distribution des labels
-    label_counter = Counter(labels)
-    print(f"Top 5 {args.label}s: {label_counter.most_common(5)}")
-    
-    # Exécuter le mode choisi
-    if args.mode in ["classify", "all"]:
-        run_classification(texts, labels, args)
+    # Si on n'est pas en mode cross-validate, on charge les données normalement
+    if args.mode != "cross_validate":
+        print("\n=== Chargement des données ===")
+        texts, metadata_list = load_lyrics_dataset(args.input_dir)
+        print(f"Total chansons: {len(texts)}")
         
-    if args.mode in ["generate", "all"]:
-        run_generation(texts, args)
+        # Récupérer les labels
+        labels = get_label_from_metadata(metadata_list, args.label)
+        print(f"{args.label}s uniques: {len(set(labels))}")
         
-    if args.mode in ["augment", "all"]:
-        run_augmentation(texts, labels, args)
+        # Afficher la distribution des labels
+        label_counter = Counter(labels)
+        print(f"Top 5 {args.label}s: {label_counter.most_common(5)}")
         
-    if args.mode in ["interpret", "all"]:
-        run_interpretation(texts, labels, args)
+        # Exécuter le mode choisi
+        if args.mode in ["classify", "all"]:
+            run_classification(texts, labels, args)
+            
+        if args.mode in ["generate", "all"]:
+            run_generation(texts, args)
+            
+        if args.mode in ["augment", "all"]:
+            run_augmentation(texts, labels, args)
+            
+        if args.mode in ["interpret", "all"]:
+            run_interpretation(texts, labels, args)
+    else:
+        # Mode validation croisée
+        run_cross_validation(args)
 
 def run_classification(texts, labels, args):
     print("\n=== Mode Classification ===")
@@ -228,26 +235,38 @@ def run_interpretation(texts, labels, args):
     # Interprétation basée sur les coefficients
     if "coefficients" in args.interpretation and hasattr(classifier.model, "coef_"):
         print("\nAnalyse de l'importance des features (coefficients):")
-        top_features = interpreter.get_feature_importance(method="coefficients")
-        for feature, importance in top_features[:10]:
-            print(f"  {feature}: {importance:.4f}")
-        
-        # Générer un nuage de mots
-        plt.figure(figsize=(10, 6))
-        wordcloud_fig = interpreter.plot_word_cloud(top_n=200)
-        wordcloud_path = os.path.join(args.output_dir, "feature_importance_wordcloud.png")
-        wordcloud_fig.savefig(wordcloud_path)
-        print(f"Nuage de mots sauvegardé: {wordcloud_path}")
+        try:
+            top_features = interpreter.get_feature_importance(method="coefficients")
+            if top_features:
+                for feature, importance in top_features[:10]:
+                    print(f"  {feature}: {importance:.4f}")
+                
+                # Générer un nuage de mots si on a des features
+                try:
+                    plt.figure(figsize=(10, 6))
+                    wordcloud_fig = interpreter.plot_word_cloud(top_n=200)
+                    wordcloud_path = os.path.join(args.output_dir, "feature_importance_wordcloud.png")
+                    wordcloud_fig.savefig(wordcloud_path)
+                    print(f"Nuage de mots sauvegardé: {wordcloud_path}")
+                except Exception as e:
+                    print(f"Erreur lors de la génération du nuage de mots: {e}")
+            else:
+                print("  Aucune feature importante trouvée.")
+        except Exception as e:
+            print(f"  Erreur lors de l'analyse des coefficients: {e}")
     
     # Interprétation basée sur la permutation
     if "permutation" in args.interpretation:
         print("\nAnalyse de l'importance des features (permutation):")
         try:
             perm_importance = interpreter.permutation_feature_importance(X, labels, n_repeats=5)
-            for feature, importance in perm_importance[:10]:
-                print(f"  {feature}: {importance:.4f}")
+            if perm_importance:
+                for feature, importance in perm_importance[:10]:
+                    print(f"  {feature}: {importance:.4f}")
+            else:
+                print("  Aucune feature importante trouvée.")
         except Exception as e:
-            print(f"Erreur lors du calcul de l'importance par permutation: {e}")
+            print(f"  Erreur lors du calcul de l'importance par permutation: {e}")
     
     # Exemple d'explication d'une prédiction
     if texts:
@@ -257,10 +276,79 @@ def run_interpretation(texts, labels, args):
             explanation = interpreter.explain_prediction(example_text, num_features=5)
             print(f"  Prédiction: {explanation['prediction']}")
             print("  Top features contribuant à la prédiction:")
-            for feature, contribution in explanation["top_features"]:
-                print(f"    {feature}: {contribution:.4f}")
+            if "top_features" in explanation and explanation["top_features"]:
+                for feature, contribution in explanation["top_features"]:
+                    print(f"    {feature}: {contribution:.4f}")
+            else:
+                print("    Aucune feature importante trouvée.")
         except Exception as e:
-            print(f"Erreur lors de l'explication de la prédiction: {e}")
+            print(f"  Erreur lors de l'explication de la prédiction: {e}")
+            
+    # Si LIME est demandé
+    if "lime" in args.interpretation:
+        print("\nExplication avec LIME:")
+        try:
+            from lime.lime_text import LimeTextExplainer
+            
+            if texts:
+                lime_expl = interpreter.explain_with_lime(texts[0][:500], num_features=5, num_samples=100)
+                print(f"  Prédiction: {lime_expl['prediction']}")
+                print("  Explications LIME:")
+                for feature, weight in lime_expl["explanations"]:
+                    print(f"    {feature}: {weight:.4f}")
+        except ImportError:
+            print("  Lime n'est pas installé. Utilisez: pip install lime")
+        except Exception as e:
+            print(f"  Erreur lors de l'explication avec LIME: {e}")
+
+def run_cross_validation(args):
+    """Mode de validation croisée entre datasets"""
+    print("\n=== Mode Validation Croisée ===")
+    
+    # Vérifier qu'on a bien les répertoires de datasets
+    if not args.dataset_dirs or len(args.dataset_dirs) < 2:
+        print("Erreur: Le mode cross_validate nécessite au moins 2 datasets.")
+        print("Exemple: --dataset_dirs dataset1 dataset2")
+        return
+        
+    # Exécuter la validation croisée
+    results = cross_dataset_validation(
+        dataset_dirs=args.dataset_dirs,
+        vectorizer_type=args.vectorizers[0] if args.vectorizers else "tfidf",
+        classifier_type=args.classifier,
+        label_type=args.label
+    )
+    
+    # Afficher les résultats sous forme de tableau
+    print("\nRésultats de la validation croisée:")
+    print("-" * 80)
+    print(f"{'Train → Test':<20} {'Précision':<10} {'F1 Macro':<10} {'Classes':<10} {'Train':<8} {'Test':<8}")
+    print("-" * 80)
+    
+    for key, result in results.items():
+        if "error" in result:
+            print(f"{key:<20} {result['error']}")
+            continue
+            
+        train, test = key.split("_to_")
+        train_base = os.path.basename(train)
+        test_base = os.path.basename(test)
+        display_key = f"{train_base} → {test_base}"
+        
+        accuracy = result.get("accuracy", 0)
+        f1 = result.get("macro_f1", 0)
+        common_classes = result.get("common_classes", 0)
+        train_size = result.get("train_size", 0)
+        test_size = result.get("test_size", 0)
+        
+        print(f"{display_key:<20} {accuracy:.3f}{'':<5} {f1:.3f}{'':<5} {common_classes:<10} {train_size:<8} {test_size:<8}")
+    
+    print("-" * 80)
+    
+    # Sauvegarder les résultats
+    output_file = os.path.join(args.output_dir, "cross_validation_results.npy")
+    np.save(output_file, results)
+    print(f"Résultats sauvegardés: {output_file}")
 
 if __name__ == "__main__":
     main() 
