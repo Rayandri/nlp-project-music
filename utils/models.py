@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
 import time
+import os
 
 class TextClassifier:
     def __init__(self, model_type: str = "logistic", **kwargs):
@@ -107,19 +108,31 @@ class TextClassifier:
 
 def plot_confusion_matrix(cm: np.ndarray, labels: List[str], 
                          title: str = "Confusion Matrix", 
-                         figsize: Tuple[int, int] = (10, 8)) -> None:
+                         figsize: Tuple[int, int] = (10, 8),
+                         output_dir: str = "results_rapport") -> None:
     plt.figure(figsize=figsize)
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
     plt.xlabel('Predictions')
     plt.ylabel('Actual values')
     plt.title(title)
     plt.tight_layout()
+    
+    # Sauvegarder l'image
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"confusion_matrix_{title.lower().replace(' ', '_')}.png")
+    plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    print(f"Confusion matrix saved: {output_file}")
+    
     plt.show()
 
-def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -> None:
+def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]], 
+                               output_dir: str = "results_rapport") -> None:
+    os.makedirs(output_dir, exist_ok=True)
+    
     methods = list(embedding_results.keys())
     accuracies = [results["accuracy"] for results in embedding_results.values()]
     
+    # Graphique de comparaison des précisions
     plt.figure(figsize=(10, 6))
     bars = plt.bar(methods, accuracies, color="skyblue")
     
@@ -133,8 +146,15 @@ def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -
     plt.title('Performance comparison of embedding methods')
     plt.ylim(0, max(accuracies) + 0.1)
     plt.tight_layout()
+    
+    # Sauvegarder l'image
+    output_file = os.path.join(output_dir, "embedding_accuracy_comparison.png")
+    plt.savefig(output_file, dpi=300, bbox_inches='tight')
+    print(f"Accuracy comparison saved: {output_file}")
+    
     plt.show()
     
+    # Graphiques des F1-scores par classe pour chaque méthode
     for method, results in embedding_results.items():
         report = results["classification_report"]
         
@@ -154,4 +174,10 @@ def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]]) -
         plt.title(f'F1-scores by class for {method}')
         plt.xlim(0, 1.0)
         plt.tight_layout()
+        
+        # Sauvegarder l'image
+        output_file = os.path.join(output_dir, f"f1_scores_{method}.png")
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        print(f"F1 scores for {method} saved: {output_file}")
+        
         plt.show() 
