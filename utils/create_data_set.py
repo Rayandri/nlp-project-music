@@ -154,6 +154,20 @@ ARTISTS = [
     # ---------- Rap ----------
     ("Rap", "Booba"), ("Rap", "PNL"), ("Rap", "Orelsan"),
     ("Rap", "Damso"), ("Rap", "Ninho"), ("Rap", "SCH"),
+    ("Rap", "Jul"), ("Rap", "Naza"), ("Rap", "Naps"), ("Rap", "Hamza"),
+    ("Rap", "Kaaris"), ("Rap", "Kalash"), ("Rap", "Alonzo"),
+    ("Rap", "Soolking"), ("Rap", "Lomepal"), ("Rap", "Nekfeu"),
+    ("Rap", "Vald"), ("Rap", "Lefa"), ("Rap", "Dinos"),
+    ("Rap", "Rohff"), ("Rap", "Sefyu"), ("Rap", "Sniper"),
+    ("Rap", "Heuss L'enfoiré"), ("Rap", "Hatik"), ("Rap", "PLK"),
+    ("Rap", "ZKR"), ("Rap", "Kalash Criminel"), ("Rap", "Gazo"),
+    ("Rap", "Tiakola"), ("Rap", "SDM"), ("Rap", "Koba LaD"),
+    ("Rap", "RK"), ("Rap", "Kery James"), ("Rap", "Fianso"),
+    ("Rap", "Sexion d'Assaut"), ("Rap", "IAM"), ("Rap", "NTM"),
+    ("Rap", "Mister You"), ("Rap", "Youssoupha"), ("Rap", "Disiz"),
+    ("Rap", "Lino"), ("Rap", "Oxmo Puccino"), ("Rap", "Chilla"),
+    ("Rap", "Alkpote"), ("Rap", "La Fouine"), ("Rap", "Timal"),
+    ("Rap", "Zed"), ("Rap", "Kikesa"), ("Rap", "Hös Copperfield")
 
     # ---------- Pop française ----------
     ("Pop française", "Angèle"), ("Pop française", "Aya Nakamura"),
