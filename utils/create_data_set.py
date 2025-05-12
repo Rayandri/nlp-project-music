@@ -57,41 +57,86 @@ def sp_token():
         return None
     hdr = {"Authorization": "Basic " +
            base64.b64encode(f"{cid}:{secret}".encode()).decode()}
-    r = requests.post("https://accounts.spotify.com/api/token",
-                      data={"grant_type": "client_credentials"}, headers=hdr, timeout=10)
-    return r.json().get("access_token")
+    
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            r = requests.post("https://accounts.spotify.com/api/token",
+                          data={"grant_type": "client_credentials"}, headers=hdr, timeout=10)
+            r.raise_for_status()  # Raise exception for HTTP errors
+            return r.json().get("access_token")
+        except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+            logging.error(f"Erreur lors de la récupération du token Spotify (tentative {attempt+1}/{max_attempts}): {e}")
+            if attempt < max_attempts - 1:
+                logging.info("Attente de 60 secondes avant nouvelle tentative...")
+                time.sleep(60)  # Wait 1 minute before retrying
+            else:
+                logging.error("Échec de la récupération du token après plusieurs tentatives")
+                return None
 
 
 def sp_get(url, token):
-    return requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=10).json()
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            r = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=10)
+            r.raise_for_status()  # Raise exception for HTTP errors
+            return r.json()
+        except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+            logging.error(f"Erreur lors de la requête à l'API Spotify (tentative {attempt+1}/{max_attempts}): {e}")
+            if attempt < max_attempts - 1:
+                logging.info("Attente de 60 secondes avant nouvelle tentative...")
+                time.sleep(60)  # Wait 1 minute before retrying
+            else:
+                logging.error(f"Échec de la requête après plusieurs tentatives: {url}")
+                return {}
 
 
 def sp_artist_id(token, name):
-    q = urllib.parse.quote(name)
-    js = sp_get(
-        f"https://api.spotify.com/v1/search?type=artist&limit=1&q={q}", token)
-    items = js.get("artists", {}).get("items", [])
-    return items[0]["id"] if items else None
+    try:
+        q = urllib.parse.quote(name)
+        js = sp_get(
+            f"https://api.spotify.com/v1/search?type=artist&limit=1&q={q}", token)
+        items = js.get("artists", {}).get("items", [])
+        return items[0]["id"] if items else None
+    except (KeyError, IndexError, TypeError) as e:
+        logging.error(f"Erreur lors de la récupération de l'ID de l'artiste {name}: {e}")
+        return None
 
 
 def sp_top_albums(token, artist_id):
     albums, seen = [], set()
-    js = sp_get(
-        f"https://api.spotify.com/v1/artists/{artist_id}/albums?include_groups=album&limit=50&market=FR", token)
-    for a in js.get("items", []):
-        name, aid = a["name"], a["id"]
-        if name.lower() in seen:
-            continue
-        seen.add(name.lower())
-        detail = sp_get(f"https://api.spotify.com/v1/albums/{aid}", token)
-        albums.append({"id": aid,
-                       "title": name,
-                       "pop": detail.get("popularity", 0),
-                       "year": (detail.get("release_date") or "0")[:4],
-                       "tracks": [t["name"] for t in detail.get("tracks", {}).get("items", [])]})
-        time.sleep(SLEEP)
-    albums.sort(key=lambda x: x["pop"], reverse=True)
-    return albums[:SP_LIMIT]
+    try:
+        js = sp_get(
+            f"https://api.spotify.com/v1/artists/{artist_id}/albums?include_groups=album&limit=50&market=FR", token)
+        
+        for a in js.get("items", []):
+            try:
+                name, aid = a["name"], a["id"]
+                if name.lower() in seen:
+                    continue
+                seen.add(name.lower())
+                
+                detail = sp_get(f"https://api.spotify.com/v1/albums/{aid}", token)
+                
+                albums.append({
+                    "id": aid,
+                    "title": name,
+                    "pop": detail.get("popularity", 0),
+                    "year": (detail.get("release_date") or "0")[:4],
+                    "tracks": [t["name"] for t in detail.get("tracks", {}).get("items", [])]
+                })
+                
+                time.sleep(SLEEP)
+            except (KeyError, IndexError, TypeError) as e:
+                logging.error(f"Erreur lors du traitement de l'album {a.get('name', 'inconnu')}: {e}")
+                continue
+            
+        albums.sort(key=lambda x: x["pop"], reverse=True)
+        return albums[:SP_LIMIT]
+    except Exception as e:
+        logging.error(f"Erreur lors de la récupération des albums pour l'artiste {artist_id}: {e}")
+        return []
 
 
 # ---------- MusicBrainz fallback ----------
@@ -99,10 +144,24 @@ MB_HEADERS = {"User-Agent": "LyricsDataset/2.0 (contact@example.com)"}
 
 
 def mb_artist_id(name):
-    js = requests.get("https://musicbrainz.org/ws/2/artist", params={
-                      "query": f'artist:"{name}"', "fmt": "json", "limit": 1}, headers=MB_HEADERS, timeout=10).json()
-    items = js.get("artists", [])
-    return items[0]["id"] if items else None
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            r = requests.get("https://musicbrainz.org/ws/2/artist", 
+                           params={"query": f'artist:"{name}"', "fmt": "json", "limit": 1}, 
+                           headers=MB_HEADERS, timeout=10)
+            r.raise_for_status()
+            js = r.json()
+            items = js.get("artists", [])
+            return items[0]["id"] if items else None
+        except (requests.exceptions.RequestException, json.JSONDecodeError, KeyError, IndexError) as e:
+            logging.error(f"Erreur lors de la récupération de l'ID MusicBrainz pour {name} (tentative {attempt+1}/{max_attempts}): {e}")
+            if attempt < max_attempts - 1:
+                logging.info("Attente de 60 secondes avant nouvelle tentative...")
+                time.sleep(60)  # Wait 1 minute before retrying
+            else:
+                logging.error(f"Échec de la récupération de l'ID MusicBrainz pour {name} après plusieurs tentatives")
+                return None
 
 
 def mb_top_albums(artist_id):
@@ -137,20 +196,6 @@ def mb_tracks(rgid):
     for m in det.get("media", []):
         tracks.extend([t["title"] for t in m.get("tracks", [])])
     return tracks
-
-# ---------- lyrics ----------
-
-
-def lyrics(artist, title):
-    r = requests.get(
-        f"https://api.lyrics.ovh/v1/{urllib.parse.quote(artist)}/{urllib.parse.quote(title)}", timeout=10)
-    if r.status_code != 200:
-        return None
-    return r.json().get("lyrics")
-
-
-# ---------- collecte ----------
-ARTISTS = [
     # ---------- Rap ----------
     ("Rap", "Booba"), ("Rap", "PNL"), ("Rap", "Orelsan"),
     ("Rap", "Damso"), ("Rap", "Ninho"), ("Rap", "SCH"),
