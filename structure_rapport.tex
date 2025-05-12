@@ -1,0 +1,278 @@
+\documentclass[a4paper,11pt]{article}
+
+% Packages nécessaires
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{subcaption}
+
+% Configuration des marges
+\usepackage[margin=2.5cm]{geometry}
+
+% Style des listings de code
+\lstset{
+  language=Python,
+  backgroundcolor=\color{gray!10},
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  commentstyle=\color{green!50!black},
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  frame=single,
+  framesep=5pt,
+  breaklines=true
+}
+
+% Informations sur le document
+\title{\textbf{Projet de Traitement Automatique du Langage Naturel\\
+Classification et Génération de Paroles de Chansons}}
+\author{Prénom Nom 1, Prénom Nom 2, Prénom Nom 3}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Ce rapport présente notre projet de traitement automatique du langage naturel (NLP) portant sur la classification et la génération de paroles de chansons. Nous avons développé et évalué diverses méthodes de classification, incluant des approches traditionnelles (Bag-of-Words, TF-IDF) et des modèles neuronaux (Word2Vec, transformers). Nous avons également expérimenté avec plusieurs techniques de génération de texte allant des modèles n-grammes aux architectures de type transformer. Ce travail explore trois approches en profondeur: l'augmentation de données textuelles, l'interprétation des modèles et le transfert de connaissances entre différents jeux de données.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\subsection{Contexte et objectifs}
+Présentation du contexte du projet, des objectifs principaux et de l'intérêt du traitement des paroles de chansons.
+
+\subsection{Approche générale}
+Description de l'approche globale adoptée dans ce projet, incluant la pipeline complète: prétraitement, vectorisation, modélisation, et évaluation.
+
+\section{Présentation du jeu de données}
+\label{sec:dataset}
+
+\subsection{Sources et structure}
+Description de l'origine du jeu de données, sa structure et organisation.
+
+\subsection{Statistiques descriptives}
+Présentation des statistiques principales: nombre de documents, distribution des classes (artistes, genres, etc.), longueur des textes.
+
+\subsection{Particularités et défis}
+Discussion sur les particularités des paroles de chansons et les défis spécifiques qu'elles posent pour les modèles NLP.
+
+\section{Prétraitement et analyse exploratoire}
+\label{sec:preprocessing}
+
+\subsection{Normalisation et tokenisation}
+Description des techniques de normalisation appliquées aux textes et des méthodes de tokenisation utilisées.
+
+\subsection{Analyse de la distribution des tokens}
+Analyse de la distribution des tokens, des mots les plus fréquents, et visualisations associées.
+
+\subsection{Utilisation du BPE (Byte Pair Encoding)}
+Explication de l'utilisation du BPE, ses avantages et son impact sur notre corpus.
+
+\section{Modèles de classification}
+\label{sec:classification}
+
+\subsection{Approches de vectorisation}
+\subsubsection{Bag-of-Words et TF-IDF}
+\subsubsection{Word2Vec et FastText}
+\subsubsection{Transformers}
+
+\subsection{Algorithmes de classification}
+\subsubsection{Régression logistique}
+\subsubsection{SVM}
+\subsubsection{Random Forest}
+
+\subsection{Résultats et comparaison}
+Présentation des résultats des différents modèles de classification, comparaison des performances et analyse.
+
+\section{Modèles de génération de texte}
+\label{sec:generation}
+
+\subsection{Modèles basés sur les n-grammes}
+Description de l'approche n-gramme pour la génération de texte et résultats obtenus.
+
+\subsection{Approches basées sur les embeddings}
+Utilisation de Word2Vec et FastText pour la génération de texte.
+
+\subsection{Modèles basés sur les transformers}
+Présentation des modèles transformer utilisés pour la génération de paroles.
+
+\subsection{Évaluation des résultats}
+Analyse comparative des différentes approches de génération, exemples de textes générés et discussion de leur qualité.
+
+\section{Approches avancées explorées}
+\label{sec:advanced}
+
+\subsection{Augmentation de données textuelles}
+\subsubsection{Méthodes implémentées}
+Description des différentes techniques d'augmentation de données implémentées.
+
+\subsubsection{Impact sur les performances}
+Analyse de l'impact de l'augmentation de données sur les performances des modèles de classification.
+
+\subsection{Interprétation des modèles}
+\subsubsection{Analyse des coefficients et importance des features}
+\subsubsection{LIME et SHAP pour l'explicabilité}
+\subsubsection{Visualisation et analyse des résultats}
+
+\subsection{Transfert de connaissances entre jeux de données}
+\subsubsection{Méthodologie de validation croisée entre datasets}
+\subsubsection{Résultats et analyse}
+
+\section{Conclusion et perspectives}
+\label{sec:conclusion}
+
+\subsection{Synthèse des résultats}
+Résumé des principales découvertes et résultats obtenus durant le projet.
+
+\subsection{Limites et difficultés rencontrées}
+Discussion sur les principales limitations et difficultés rencontrées.
+
+\subsection{Perspectives d'amélioration}
+Propositions de pistes d'amélioration et de travaux futurs.
+
+\section*{Bibliographie}
+\begin{thebibliography}{9}
+\bibitem{mikolov} Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., \& Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems.
+
+\bibitem{vaswani} Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... \& Polosukhin, I. (2017). Attention is all you need. In Advances in neural information processing systems.
+
+\bibitem{devlin} Devlin, J., Chang, M. W., Lee, K., \& Toutanova, K. (2018). Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805.
+
+\bibitem{eda} Wei, J., \& Zou, K. (2019). EDA: Easy data augmentation techniques for boosting performance on text classification tasks. arXiv preprint arXiv:1901.11196.
+\end{thebibliography}
+
+\newpage
+\appendix
+\section{Annexe: Code source principal}
+\label{app:code}
+
+\subsection{Extrait du code de classification}
+\begin{lstlisting}[caption=Classification des paroles]
+# Exemple de code de classification
+def run_classification(texts, labels, args):
+    print("\n=== Mode Classification ===")
+    
+    results = {}
+    best_accuracy = 0
+    best_method = None
+    
+    for method in args.vectorizers:
+        print(f"\nMéthode de vectorisation: {method}")
+        vectorizer = TextVectorizer(method=method)
+        X = vectorizer.fit_transform(texts)
+        print(f"Dimensions des vecteurs: {X.shape}")
+        
+        classifier = TextClassifier(model_type=args.classifier)
+        eval_results = classifier.train(
+            X, labels, 
+            test_size=0.2, 
+            random_state=args.random_seed, 
+            stratify=True
+        )
+        
+        accuracy = eval_results["accuracy"]
+        report = eval_results["classification_report"]
+        
+        print(f"Précision: {accuracy:.3f}")
+        print(f"F1-score macro: {report['macro avg']['f1-score']:.3f}")
+        
+        results[method] = eval_results
+\end{lstlisting}
+
+\subsection{Extrait du code de génération}
+\begin{lstlisting}[caption=Génération de paroles]
+# Exemple de code de génération
+def _generate_ngram(self, prompt: str, max_length: int) -> str:
+    """Génère du texte avec le modèle n-gram"""
+    tokens = prompt.split() if prompt else ["<START>"]
+    n = 3  # Tri-gram
+
+    # Générer du texte
+    for _ in range(max_length):
+        # Prendre les n-1 derniers tokens comme préfixe
+        prefix = tuple(tokens[-(n-1):]) if len(tokens) >= n-1 else tuple(tokens + ["<START>"] * (n-1 - len(tokens)))
+        
+        # Si ce préfixe n'existe pas, en choisir un aléatoirement
+        if prefix not in self.model or not self.model[prefix]:
+            if not self.vocab:
+                break
+            next_token = random.choice(list(self.vocab.keys()))
+        else:
+            # Choix pondéré du token suivant
+            candidates = self.model[prefix]
+            next_token = random.choices(
+                list(candidates.keys()),
+                weights=list(candidates.values()),
+                k=1
+            )[0]
+        
+        tokens.append(next_token)
+        
+        # Arrêter si on a généré un token de fin
+        if next_token == "<END>":
+            break
+            
+    return " ".join(tokens)
+\end{lstlisting}
+
+\subsection{Extrait du code d'augmentation de données}
+\begin{lstlisting}[caption=Augmentation de données]
+# Exemple de code d'augmentation de données
+def augment_dataset(texts, labels, methods=None, factor=0.5, balanced=True):
+    """Augmente un dataset complet avec un facteur donné"""
+    
+    augmenter = DataAugmenter()
+    augmented_texts = []
+    augmented_labels = []
+    
+    # Calculer le nombre d'exemples à ajouter
+    num_new_examples = int(len(texts) * factor)
+    
+    if balanced:
+        # Augmentation équilibrée entre les classes
+        label_counts = Counter(labels)
+        label_indices = {label: [i for i, l in enumerate(labels) if l == label] for label in set(labels)}
+        
+        # Calculer le nombre d'exemples à ajouter par classe
+        examples_per_class = {}
+        for label in label_counts:
+            # Classes minoritaires reçoivent plus d'augmentations
+            inverse_freq = 1 / label_counts[label]
+            examples_per_class[label] = int(num_new_examples * inverse_freq / sum(1/count for count in label_counts.values()))
+        
+        # Augmenter chaque classe
+        for label, num_examples in examples_per_class.items():
+            indices = label_indices[label]
+            
+            # Limiter à ce qui est disponible
+            num_examples = min(num_examples, len(indices) * 3)
+            
+            for _ in range(num_examples):
+                idx = random.choice(indices)
+                text = texts[idx]
+                augmented = augmenter.augment(text, methods, num_augmentations=1)[0]
+                augmented_texts.append(augmented)
+                augmented_labels.append(label)
+    
+    # Combiner avec le dataset original
+    all_texts = texts + augmented_texts
+    all_labels = labels + augmented_labels
+    
+    return all_texts, all_labels
+\end{lstlisting}
+
+\end{document} 

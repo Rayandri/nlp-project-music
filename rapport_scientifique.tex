@@ -1,0 +1,236 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage[margin=2.5cm]{geometry}
+
+% Style pour les listings de code
+\lstset{
+  language=Python,
+  backgroundcolor=\color{gray!10},
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  commentstyle=\color{green!50!black},
+  keywordstyle=\color{blue},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single
+}
+
+\title{\textbf{Analyse et génération de paroles de chansons\\
+Projet NLP}}
+\author{Noms des membres de l'équipe}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Présentation du jeu de données}
+\label{sec:dataset}
+
+\subsection{Structure et statistiques}
+% Inclure uniquement des faits objectifs et mesurables
+\begin{itemize}
+    \item Nombre total de documents: N
+    \item Distribution des classes: X artistes, Y genres, Z albums
+    \item Longueur moyenne des textes: N mots
+    \item Nombre moyen de textes par artiste: N
+    \item Vocabulaire total: N mots uniques
+\end{itemize}
+
+\subsection{Caractéristiques linguistiques}
+% Facteurs spécifiques et objectifs
+\begin{itemize}
+    \item Fréquence des pronoms: X\%
+    \item Longueur moyenne des phrases: N mots
+    \item Ratio mots uniques/total: X
+    \item Phénomènes linguistiques mesurés: argot, répétitions, structures syntaxiques non standard
+\end{itemize}
+
+\section{Prétraitement et analyse}
+\label{sec:preprocessing}
+
+\subsection{Pipeline de prétraitement}
+% Description factuelle des étapes techniques
+\begin{enumerate}
+    \item Normalisation: mise en minuscules, suppression des ponctuations
+    \item Tokenisation: séparation des mots, traitement des contractions
+    \item Filtrage: élimination des mots vides (optionnel)
+    \item Tokenisation BPE: N fusions
+\end{enumerate}
+
+\subsection{Analyse statistique}
+% Uniquement des mesures objectives
+\begin{itemize}
+    \item Distribution de la longueur des documents: moyenne=N, écart-type=M
+    \item Hapax (mots apparaissant une seule fois): N\% du corpus
+    \item Tokens les plus fréquents: [liste des 10 plus fréquents avec pourcentages]
+    \item Répartition des classes: indice de Gini=X
+\end{itemize}
+
+\section{Classification}
+\label{sec:classification}
+
+\subsection{Méthodes implémentées}
+% Description technique sans fioritures
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Vectorisation} & \textbf{Classificateur} & \textbf{Précision} & \textbf{F1-score} \\
+\midrule
+Bag-of-Words & Naïve Bayes & X\% & Y\% \\
+TF-IDF & Régression logistique & X\% & Y\% \\
+Word2Vec & SVM & X\% & Y\% \\
+FastText & Random Forest & X\% & Y\% \\
+Transformer & Régression logistique & X\% & Y\% \\
+\bottomrule
+\end{tabular}
+\caption{Résultats comparatifs des différentes approches de classification}
+\label{tab:classification-results}
+\end{table}
+
+\subsection{Analyse des performances}
+% Observations factuelles basées sur les résultats
+\begin{itemize}
+    \item Matrice de confusion pour le meilleur modèle
+    \item Analyse des erreurs de classification: confusion entre artistes similaires
+    \item Impact de la taille du corpus d'entraînement: courbe d'apprentissage
+    \item Effet de la dimension des vecteurs sur les performances
+\end{itemize}
+
+\section{Génération de texte}
+\label{sec:generation}
+
+\subsection{Modèles implémentés}
+% Paramètres et configurations techniques
+\begin{itemize}
+    \item N-gramme (n=3): perplexité=X
+    \item Word2Vec (dim=100): perplexité=X
+    \item FastText (dim=100): perplexité=X
+    \item Transformer (base=distilgpt2): perplexité=X
+\end{itemize}
+
+\subsection{Évaluation quantitative}
+% Mesures objectives uniquement
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Modèle} & \textbf{Perplexité} & \textbf{BLEU} \\
+\midrule
+N-gramme & X & Y \\
+Word2Vec & X & Y \\
+FastText & X & Y \\
+Transformer & X & Y \\
+\bottomrule
+\end{tabular}
+\caption{Métriques d'évaluation des modèles de génération}
+\label{tab:generation-metrics}
+\end{table}
+
+\section{Approches avancées}
+\label{sec:advanced}
+
+\subsection{Augmentation de données}
+% Description technique et résultats mesurables
+\begin{itemize}
+    \item Méthodes implémentées: suppression aléatoire, permutations, remplacements synonymiques
+    \item Facteur d'augmentation: X
+    \item Impact sur la précision: +Y\% (moyenne sur 5 exécutions)
+    \item Effet sur les classes minoritaires: +Z\% de F1-score
+\end{itemize}
+
+\subsection{Interprétation des modèles}
+% Analyses factuelles sans spéculation
+\begin{itemize}
+    \item Importance des features: [top 10 features avec leur poids relatif]
+    \item Analyse LIME: [exemples concrets avec scores]
+    \item Correspondance entre features importantes et caractéristiques linguistiques
+\end{itemize}
+
+\subsection{Transfert entre jeux de données}
+% Résultats expérimentaux concrets
+\begin{itemize}
+    \item Performance baseline: X\% (entraînement et test sur le même dataset)
+    \item Performance crossover: Y\% (entraînement sur dataset1, test sur dataset2)
+    \item Analyse des classes communes: Z\% de chevauchement
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\subsection{Résultats principaux}
+% Résumé factuel des découvertes clés
+\begin{itemize}
+    \item Meilleure approche pour la classification: [modèle] avec [précision]
+    \item Meilleure approche pour la génération: [modèle] avec [perplexité]
+    \item Impact de l'augmentation de données: [chiffre]
+    \item Interprétabilité du modèle: [observation factuelle]
+\end{itemize}
+
+\subsection{Limites techniques}
+% Obstacles objectifs rencontrés
+\begin{itemize}
+    \item Taille limitée du corpus: N documents
+    \item Déséquilibre des classes: ratio max/min = X
+    \item Ressources computationnelles: contraintes de temps/mémoire
+    \item Exactitude des évaluations: limitations des métriques
+\end{itemize}
+
+\bibliographystyle{plain}
+\begin{thebibliography}{9}
+\bibitem{mikolov} Mikolov, T., et al. (2013). Distributed representations of words and phrases and their compositionality. NIPS.
+\bibitem{vaswani} Vaswani, A., et al. (2017). Attention is all you need. NIPS.
+\bibitem{eda} Wei, J., Zou, K. (2019). EDA: Easy data augmentation techniques for boosting performance on text classification tasks. arXiv:1901.11196.
+\bibitem{lime} Ribeiro, M. T., et al. (2016). "Why should I trust you?": Explaining the predictions of any classifier. KDD.
+\end{thebibliography}
+
+\appendix
+\section{Code source}
+\label{app:code}
+
+\subsection{Extrait du code de classification}
+\begin{lstlisting}[caption=Implémentation du classificateur]
+def run_classification(texts, labels, args):
+    print("\n=== Mode Classification ===")
+    
+    results = {}
+    best_accuracy = 0
+    best_method = None
+    
+    for method in args.vectorizers:
+        print(f"\nMéthode de vectorisation: {method}")
+        vectorizer = TextVectorizer(method=method)
+        X = vectorizer.fit_transform(texts)
+        print(f"Dimensions des vecteurs: {X.shape}")
+        
+        classifier = TextClassifier(model_type=args.classifier)
+        eval_results = classifier.train(
+            X, labels, 
+            test_size=0.2, 
+            random_state=args.random_seed, 
+            stratify=True
+        )
+        
+        accuracy = eval_results["accuracy"]
+        report = eval_results["classification_report"]
+        
+        print(f"Précision: {accuracy:.3f}")
+        print(f"F1-score macro: {report['macro avg']['f1-score']:.3f}")
+        
+        results[method] = eval_results
+\end{lstlisting}
+
+\end{document} 
