@@ -1,5 +1,5 @@
 === RÉSUMÉ GLOBAL DES RÉSULTATS ===
-Date: Mon May 12 17:37:27 CEST 2025
+Date: Mon May 12 19:49:43 CEST 2025
 
 === Classification ===
 Précision: 0.3587
@@ -25,21 +25,21 @@ Meilleure méthode: tfidf (Précision: 0.4293)
 Perplexité des modèles:
 
 === Augmentation ===
-  Amélioration: 1.63%
-  Amélioration: 1.63%
-  Amélioration: 4.35%
+  Amélioration: 2.58%
+  Amélioration: 3.58%
+  Amélioration: 10.34%
 
 === Interprétation ===
 Importance des features (coefficients):
-  la: 0.2354
-  je: 0.2204
-  de: 0.2107
-  les: 0.2091
-  you: 0.2027
+  je: 0.4815
+  la: 0.4790
+  de: 0.4590
+  the: 0.4459
+  you: 0.4083
 --
 Importance des features (permutation):
-  la: 0.2354
-  je: 0.2204
+  je: 0.4815
+  la: 0.4790
 
 === VISUALISATIONS GÉNÉRÉES ===
 results_rapport/augmentation_impact.png
