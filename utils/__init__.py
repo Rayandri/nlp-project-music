@@ -1,3 +1,7 @@
+"""
+Utility modules for the lyrics classification and generation project.
+"""
+
 from utils.tokenizer import BPETokenizer
 from utils.data_loader import (
     load_lyrics_dataset, 

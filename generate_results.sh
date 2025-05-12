@@ -19,7 +19,6 @@ echo "Utilisation maximale: $TOTAL_THREADS threads pour tous les calculs"
 # Création des répertoires pour les résultats
 RESULTS_DIR="results_rapport"
 
-
 mkdir -p $RESULTS_DIR
 
 echo "=== Génération des données pour le rapport ==="

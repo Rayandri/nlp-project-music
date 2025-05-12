@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Script simple pour générer des fichiers pkl
+Simple script to generate pickle files with model and vectorizer.
 """
 
 import os
@@ -12,6 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def main():
+    """Create test models and save them to pickle files."""
     print("Création de modèles de test...")
     
     # Créer le répertoire de sortie

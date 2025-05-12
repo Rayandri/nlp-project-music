@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Analyze class distribution and statistics in the dataset.
+"""
+
 import os
 import argparse
 import matplotlib.pyplot as plt
@@ -11,6 +15,7 @@ import numpy as np
 from utils.data_loader import load_lyrics_dataset, get_label_from_metadata
 
 def parse_args():
+    """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Analyser la distribution des classes dans le dataset")
     parser.add_argument("--input_dir", type=str, default="lyrics_dataset")
     parser.add_argument("--label", type=str, choices=["artiste", "album", "genre", "année"], default="artiste")
@@ -20,17 +25,14 @@ def parse_args():
     return parser.parse_args()
 
 def analyze_distribution(labels, title, min_samples=0, top_n=20):
-    # Count frequency of each label
+    """Analyze and visualize label distribution in the dataset."""
     counter = Counter(labels)
     
-    # Filter by minimum samples if needed
     if min_samples > 0:
         counter = Counter({k: v for k, v in counter.items() if v >= min_samples})
     
-    # Get top N most common classes
     most_common = counter.most_common(top_n)
     
-    # Calculate statistics
     class_counts = list(counter.values())
     total_classes = len(counter)
     min_count = min(class_counts)
@@ -38,26 +40,21 @@ def analyze_distribution(labels, title, min_samples=0, top_n=20):
     avg_count = sum(class_counts) / total_classes
     median_count = sorted(class_counts)[total_classes // 2]
     
-    # Calculate imbalance ratio
     imbalance_ratio = max_count / min_count if min_count > 0 else float('inf')
     
-    # Print statistics
     print(f"\n=== Distribution Analysis: {title} ===")
     print(f"Total classes: {total_classes}")
     print(f"Total samples: {sum(class_counts)}")
     print(f"Samples per class: min={min_count}, max={max_count}, avg={avg_count:.1f}, median={median_count}")
     print(f"Imbalance ratio (max/min): {imbalance_ratio:.2f}")
     
-    # Calculate how many classes have at least N samples
     thresholds = [2, 5, 10, 20, 50]
     for t in thresholds:
         classes_with_n = sum(1 for count in class_counts if count >= t)
         print(f"Classes with at least {t} samples: {classes_with_n} ({100*classes_with_n/total_classes:.1f}%)")
     
-    # Plot distribution
     plt.figure(figsize=(12, 8))
     
-    # Bar plot of top N classes
     classes, counts = zip(*most_common)
     plt.bar(range(len(classes)), counts)
     plt.xticks(range(len(classes)), classes, rotation=45, ha="right")
@@ -66,24 +63,21 @@ def analyze_distribution(labels, title, min_samples=0, top_n=20):
     plt.ylabel("Number of samples")
     plt.tight_layout()
     
-    # Add count labels on bars
     for i, count in enumerate(counts):
         plt.text(i, count + 0.5, str(count), ha='center')
         
     return plt.gcf()
 
 def main():
+    """Main function for dataset analysis."""
     args = parse_args()
     
-    # Load dataset
     print(f"Loading data from {args.input_dir}...")
     texts, metadata_list = load_lyrics_dataset(args.input_dir)
     print(f"Loaded {len(texts)} songs")
     
-    # Extract labels
     labels = get_label_from_metadata(metadata_list, args.label)
     
-    # Analyze distribution
     fig = analyze_distribution(
         labels, 
         title=f"Distribution of {args.label}",
@@ -91,16 +85,13 @@ def main():
         top_n=args.top_n
     )
     
-    # Save figure
     fig.savefig(args.output, dpi=200, bbox_inches='tight')
     print(f"Analysis plot saved to {args.output}")
     
-    # Also print most common classes
     print("\nTop 10 most common classes:")
     for label, count in Counter(labels).most_common(10):
         print(f"  {label}: {count} samples")
     
-    # Print classes with only one sample
     singleton_classes = [label for label, count in Counter(labels).items() if count == 1]
     print(f"\nClasses with only one sample: {len(singleton_classes)}")
     if len(singleton_classes) <= 10:

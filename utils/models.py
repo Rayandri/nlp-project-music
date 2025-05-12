@@ -1,3 +1,7 @@
+"""
+Text classification models and evaluation utilities.
+"""
+
 import numpy as np
 from typing import List, Dict, Tuple, Any, Optional
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -13,7 +17,15 @@ import os
 import pickle
 
 class TextClassifier:
+    """Text classification model wrapper with training and evaluation utilities."""
+    
     def __init__(self, model_type: str = "logistic", **kwargs):
+        """Initialize a classifier with the specified model type.
+        
+        Args:
+            model_type: Type of classifier ("logistic", "svm", "random_forest")
+            **kwargs: Additional parameters for the model
+        """
         self.model_type = model_type.lower()
         self.model = None
         
@@ -44,9 +56,20 @@ class TextClassifier:
     
     def train(self, X: np.ndarray, y: List[str], test_size: float = 0.2, 
              random_state: int = 42, stratify: bool = True) -> Dict[str, Any]:
+        """Train the model and evaluate its performance.
+        
+        Args:
+            X: Feature matrix
+            y: Target labels
+            test_size: Proportion of data to use for testing
+            random_state: Random seed for reproducibility
+            stratify: Whether to use stratified splitting
+            
+        Returns:
+            Dictionary with evaluation results
+        """
         start_time = time.time()
         
-        # Check label distribution
         class_counts = Counter(y)
         min_count = min(class_counts.values())
         max_count = max(class_counts.values())
@@ -55,7 +78,6 @@ class TextClassifier:
         print(f"Class distribution: {len(class_counts)} classes, min samples: {min_count}, max samples: {max_count}")
         print(f"Imbalance ratio: {imbalance_ratio:.2f}")
         
-        # Determine stratification
         stratify_data = None
         if stratify:
             if min_count >= 2:
@@ -64,7 +86,6 @@ class TextClassifier:
                 print(f"Warning: Some classes have fewer than 2 samples (minimum: {min_count}).")
                 print("Falling back to non-stratified split.")
         
-        # Split data
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=test_size, random_state=random_state, stratify=stratify_data
         )
@@ -72,17 +93,14 @@ class TextClassifier:
         print(f"Split data in {time.time() - start_time:.2f} seconds")
         cv_start = time.time()
         
-        # Optional: cross-validation score with parallelization
         cv_scores = cross_val_score(self.model, X_train, y_train, cv=5, n_jobs=-1)
         print(f"Cross-validation score: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
         print(f"Cross-validation completed in {time.time() - cv_start:.2f} seconds")
         
-        # Train model
         fit_start = time.time()
         self.model.fit(X_train, y_train)
         print(f"Model fitting completed in {time.time() - fit_start:.2f} seconds")
         
-        # Evaluate
         eval_start = time.time()
         y_pred = self.model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
@@ -102,20 +120,31 @@ class TextClassifier:
         }
     
     def predict(self, X: np.ndarray) -> List[str]:
+        """Predict labels for the given feature matrix.
+        
+        Args:
+            X: Feature matrix
+            
+        Returns:
+            List of predicted labels
+        """
         if self.model is None:
             raise ValueError("Model not trained. Call train() first.")
         
         return self.model.predict(X)
     
     def save_model(self, path: str, vectorizer=None) -> None:
-        """Sauvegarde le modèle et éventuellement le vectorizeur dans un fichier pickle"""
+        """Save the model and vectorizer to a pickle file.
+        
+        Args:
+            path: Path to save the model
+            vectorizer: Optional vectorizer to save alongside the model
+        """
         if self.model is None:
             raise ValueError("Model not trained. Call train() first.")
         
-        # Créer le dossier si nécessaire
         os.makedirs(os.path.dirname(path), exist_ok=True)
         
-        # Sauvegarder tout dans un dictionnaire
         data = {
             'model': self.model,
             'model_type': self.model_type,
@@ -129,11 +158,17 @@ class TextClassifier:
     
     @staticmethod
     def load_model(path: str) -> Tuple[Any, Any]:
-        """Charge un modèle et son vectorizeur depuis un fichier pickle"""
+        """Load a model and its vectorizer from a pickle file.
+        
+        Args:
+            path: Path to the model file
+            
+        Returns:
+            Tuple of (classifier, vectorizer)
+        """
         with open(path, 'rb') as f:
             data = pickle.load(f)
         
-        # Créer une nouvelle instance
         classifier = TextClassifier(model_type=data['model_type'])
         classifier.model = data['model']
         
@@ -143,6 +178,15 @@ def plot_confusion_matrix(cm: np.ndarray, labels: List[str],
                          title: str = "Confusion Matrix", 
                          figsize: Tuple[int, int] = (10, 8),
                          output_dir: str = "results_rapport") -> None:
+    """Plot and save a confusion matrix.
+    
+    Args:
+        cm: Confusion matrix array
+        labels: Class labels
+        title: Plot title
+        figsize: Figure size
+        output_dir: Directory to save the plot
+    """
     plt.figure(figsize=figsize)
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
     plt.xlabel('Predictions')
@@ -150,7 +194,6 @@ def plot_confusion_matrix(cm: np.ndarray, labels: List[str],
     plt.title(title)
     plt.tight_layout()
     
-    # Sauvegarder l'image
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"confusion_matrix_{title.lower().replace(' ', '_')}.png")
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -160,12 +203,17 @@ def plot_confusion_matrix(cm: np.ndarray, labels: List[str],
 
 def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]], 
                                output_dir: str = "results_rapport") -> None:
+    """Compare and visualize performance of multiple embedding methods.
+    
+    Args:
+        embedding_results: Dictionary mapping embedding method name to evaluation results
+        output_dir: Directory to save the plots
+    """
     os.makedirs(output_dir, exist_ok=True)
     
     methods = list(embedding_results.keys())
     accuracies = [results["accuracy"] for results in embedding_results.values()]
     
-    # Graphique de comparaison des précisions
     plt.figure(figsize=(10, 6))
     bars = plt.bar(methods, accuracies, color="skyblue")
     
@@ -180,14 +228,12 @@ def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]],
     plt.ylim(0, max(accuracies) + 0.1)
     plt.tight_layout()
     
-    # Sauvegarder l'image
     output_file = os.path.join(output_dir, "embedding_accuracy_comparison.png")
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     print(f"Accuracy comparison saved: {output_file}")
     
     plt.show()
     
-    # Graphiques des F1-scores par classe pour chaque méthode
     for method, results in embedding_results.items():
         report = results["classification_report"]
         
@@ -208,7 +254,6 @@ def evaluate_multiple_embeddings(embedding_results: Dict[str, Dict[str, Any]],
         plt.xlim(0, 1.0)
         plt.tight_layout()
         
-        # Sauvegarder l'image
         output_file = os.path.join(output_dir, f"f1_scores_{method}.png")
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
         print(f"F1 scores for {method} saved: {output_file}")

@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Interface web simple pour tester le classifieur d'artistes
-Exécuter avec: python web_app.py
+Simple web interface for the lyrics classifier.
 """
 
 import os
@@ -12,41 +11,34 @@ import pickle
 from flask import Flask, request, render_template, redirect, url_for
 import numpy as np
 
-# Import des classes pour la prédiction
 from utils.models import TextClassifier
 from utils.vectorizers import TextVectorizer
 
 app = Flask(__name__)
 
-# Chemin vers le modèle
 MODEL_PATH = "results/models/best_artiste.pkl"
 
 def check_model_exists():
-    """Vérifie si le modèle existe"""
+    """Check if the model file exists."""
     return os.path.exists(MODEL_PATH)
 
 def predict_lyrics(text):
-    """Prédit l'artiste à partir des paroles"""
+    """Predict artist from lyrics text."""
     if not check_model_exists():
         return "Modèle non trouvé", []
     
     try:
-        # Charger le modèle
         classifier, vectorizer = TextClassifier.load_model(MODEL_PATH)
         
-        # Vectoriser le texte
         X = vectorizer.transform([text])
         
-        # Prédire l'artiste
         prediction = classifier.predict(X)[0]
         
-        # Récupérer les probabilités
         scores = []
         if hasattr(classifier.model, "predict_proba"):
             probs = classifier.model.predict_proba(X)[0]
             classes = classifier.model.classes_
             
-            # Trier par probabilité décroissante
             sorted_indices = np.argsort(probs)[::-1]
             scores = [(classes[idx], probs[idx]) for idx in sorted_indices[:5]]
         
@@ -57,6 +49,7 @@ def predict_lyrics(text):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """Main route for the web interface."""
     prediction = None
     probabilities = None
     lyrics = ""
@@ -76,7 +69,6 @@ def index():
     )
 
 if __name__ == '__main__':
-    # Vérifier si Flask est installé
     try:
         import flask
     except ImportError:
