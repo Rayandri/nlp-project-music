@@ -5,17 +5,16 @@
 
 # Détection automatique du nombre de threads disponibles
 TOTAL_THREADS=$(nproc)
-PHYSICAL_CORES=$((TOTAL_THREADS / 2)) # Estimation pour CPU hyperthreadé
 
-# Configuration pour optimiser la parallélisation
-export OPENBLAS_NUM_THREADS=$PHYSICAL_CORES
-export MKL_NUM_THREADS=$PHYSICAL_CORES
-export OMP_NUM_THREADS=$PHYSICAL_CORES
+# Configuration pour utiliser TOUTE la puissance disponible
+export OPENBLAS_NUM_THREADS=$TOTAL_THREADS
+export MKL_NUM_THREADS=$TOTAL_THREADS
+export OMP_NUM_THREADS=$TOTAL_THREADS
 export PYTHONPATH=.
 export JOBLIB_TEMP_FOLDER=/tmp
 export JOBLIB_THREADS=$TOTAL_THREADS
 
-echo "Détection: $TOTAL_THREADS threads total, utilisation de $PHYSICAL_CORES threads pour calculs numériques"
+echo "Utilisation maximale: $TOTAL_THREADS threads pour tous les calculs"
 
 # Création des répertoires pour les résultats
 RESULTS_DIR="results_rapport"
