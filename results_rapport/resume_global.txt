@@ -1,0 +1,60 @@
+=== RÉSUMÉ GLOBAL DES RÉSULTATS ===
+Date: Mon May 12 17:37:27 CEST 2025
+
+=== Classification ===
+Précision: 0.3587
+F1-score macro: 0.2392
+F1-score pondéré: 0.3437
+Précision: 0.4293
+F1-score macro: 0.3211
+F1-score pondéré: 0.4174
+Précision: 0.1685
+F1-score macro: 0.1185
+F1-score pondéré: 0.1585
+Précision: 0.1467
+F1-score macro: 0.0808
+F1-score pondéré: 0.1307
+Précision: 0.2120
+F1-score macro: 0.1517
+F1-score pondéré: 0.2126
+Meilleure méthode: tfidf (Précision: 0.4293)
+
+=== Génération ===
+=== Résultats de Génération de Texte ===
+
+Perplexité des modèles:
+
+=== Augmentation ===
+  Amélioration: 1.63%
+  Amélioration: 1.63%
+  Amélioration: 4.35%
+
+=== Interprétation ===
+Importance des features (coefficients):
+  la: 0.2354
+  je: 0.2204
+  de: 0.2107
+  les: 0.2091
+  you: 0.2027
+--
+Importance des features (permutation):
+  la: 0.2354
+  je: 0.2204
+
+=== VISUALISATIONS GÉNÉRÉES ===
+results_rapport/augmentation_impact.png
+results_rapport/confusion_matrix_confusion_matrix_-_bow.png
+results_rapport/confusion_matrix_confusion_matrix_-_fasttext.png
+results_rapport/confusion_matrix_confusion_matrix_-_tfidf.png
+results_rapport/confusion_matrix_confusion_matrix_-_transformer.png
+results_rapport/confusion_matrix_confusion_matrix_-_word2vec.png
+results_rapport/dataset_size_vs_performance.png
+results_rapport/embedding_accuracy_comparison.png
+results_rapport/f1_scores_bow.png
+results_rapport/f1_scores_fasttext.png
+results_rapport/f1_scores_tfidf.png
+results_rapport/f1_scores_transformer.png
+results_rapport/f1_scores_word2vec.png
+results_rapport/feature_importance_wordcloud.png
+results_rapport/feature_importance_wordcloud_detailed.png
+results_rapport/permutation_importance.png

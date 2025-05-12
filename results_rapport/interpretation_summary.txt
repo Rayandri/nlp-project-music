@@ -1,0 +1,70 @@
+=== Résultats d'Interprétation du Modèle ===
+
+Importance des features (coefficients):
+  la: 0.2354
+  je: 0.2204
+  de: 0.2107
+  les: 0.2091
+  you: 0.2027
+  pas: 0.2007
+  tu: 0.1891
+  on: 0.1846
+  et: 0.1741
+  le: 0.1740
+  est: 0.1714
+  un: 0.1661
+  elle: 0.1603
+  suis: 0.1543
+  que: 0.1531
+  des: 0.1525
+  oh: 0.1522
+  qu: 0.1504
+  dans: 0.1441
+  qui: 0.1413
+
+Importance des features (permutation):
+  la: 0.2354
+  je: 0.2204
+  de: 0.2107
+  les: 0.2091
+  you: 0.2027
+  pas: 0.2007
+  tu: 0.1891
+  on: 0.1846
+  et: 0.1741
+  le: 0.1740
+  est: 0.1714
+  un: 0.1661
+  elle: 0.1603
+  suis: 0.1543
+  que: 0.1531
+  des: 0.1525
+  oh: 0.1522
+  qu: 0.1504
+  dans: 0.1441
+  qui: 0.1413
+
+Comparaison des méthodes d'importance:
+Chevauchement dans le top 20: 20 features
+Features communes:
+  suis
+  dans
+  est
+  oh
+  je
+  tu
+  de
+  et
+  qu
+  un
+  you
+  pas
+  qui
+  on
+  des
+  que
+  le
+  les
+  elle
+  la
+

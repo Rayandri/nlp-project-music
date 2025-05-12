@@ -1,0 +1,25 @@
+=== Résultats d'Augmentation de Données ===
+
+Baseline (sans augmentation):
+  Précision: 0.1902
+  F1-score: 0.0796
+  Taille du dataset: 734
+
+Avec augmentation (facteur 0.3):
+  Précision: 0.2065
+  F1-score: 0.1027
+  Taille du dataset: 839
+  Amélioration: 1.63%
+
+Avec augmentation (facteur 0.5):
+  Précision: 0.2065
+  F1-score: 0.0958
+  Taille du dataset: 915
+  Amélioration: 1.63%
+
+Avec augmentation (facteur 1.0):
+  Précision: 0.2337
+  F1-score: 0.1449
+  Taille du dataset: 1102
+  Amélioration: 4.35%
+
