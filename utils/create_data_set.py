@@ -13,7 +13,7 @@ from collections import defaultdict
 ROOT_DIR = "lyrics_dataset"
 REPORT = "collection_report.json"
 LOG_FILE = "collection.log"
-SP_LIMIT = 3            # albums par artiste (mini)
+SP_LIMIT = 10            # albums par artiste (max)
 SLEEP = 0.015         # pour éviter le rate-limit
 CID = "4dab290d280d4d06af8d029195c90e2c"
 SECRET = "bf7127954d454b17af2ac620f83e7153"
