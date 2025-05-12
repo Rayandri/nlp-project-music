@@ -204,30 +204,82 @@ def mb_top_albums(artist_id):
 
 
 def mb_tracks(rgid):
-    js = requests.get(f"https://musicbrainz.org/ws/2/release-group/{rgid}",
-                      params={"inc": "releases", "fmt": "json"},
-                      headers=MB_HEADERS, timeout=10).json()
-    rels = js.get("releases", [])
-    if not rels:
-        return []
-    rid = rels[0]["id"]
-    det = requests.get(f"https://musicbrainz.org/ws/2/release/{rid}",
-                       params={"inc": "recordings", "fmt": "json"},
-                       headers=MB_HEADERS, timeout=10).json()
-    tracks = []
-    for m in det.get("media", []):
-        tracks.extend([t["title"] for t in m.get("tracks", [])])
-    return tracks
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            r = requests.get(f"https://musicbrainz.org/ws/2/release-group/{rgid}",
+                           params={"inc": "releases", "fmt": "json"},
+                           headers=MB_HEADERS, timeout=10)
+            r.raise_for_status()
+            js = r.json()
+            rels = js.get("releases", [])
+            
+            if not rels:
+                return []
+                
+            rid = rels[0]["id"]
+            
+            r_det = requests.get(f"https://musicbrainz.org/ws/2/release/{rid}",
+                              params={"inc": "recordings", "fmt": "json"},
+                              headers=MB_HEADERS, timeout=10)
+            r_det.raise_for_status()
+            det = r_det.json()
+            
+            tracks = []
+            for m in det.get("media", []):
+                try:
+                    tracks.extend([t["title"] for t in m.get("tracks", [])])
+                except (KeyError, TypeError) as e:
+                    logging.warning(f"Erreur lors de l'extraction des titres de pistes: {e}")
+                    continue
+            
+            return tracks
+            
+        except (requests.exceptions.RequestException, json.JSONDecodeError, KeyError, IndexError) as e:
+            logging.error(f"Erreur lors de la récupération des pistes pour {rgid} (tentative {attempt+1}/{max_attempts}): {e}")
+            if attempt < max_attempts - 1:
+                logging.info("Attente de 60 secondes avant nouvelle tentative...")
+                time.sleep(60)  # Wait 1 minute before retrying
+            else:
+                logging.error(f"Échec de la récupération des pistes pour {rgid} après plusieurs tentatives")
+                return []
 
 # ---------- lyrics ----------
 
 
 def lyrics(artist, title):
-    r = requests.get(
-        f"https://api.lyrics.ovh/v1/{urllib.parse.quote(artist)}/{urllib.parse.quote(title)}", timeout=10)
-    if r.status_code != 200:
-        return None
-    return r.json().get("lyrics")
+    max_attempts = 3
+    for attempt in range(max_attempts):
+        try:
+            r = requests.get(
+                f"https://api.lyrics.ovh/v1/{urllib.parse.quote(artist)}/{urllib.parse.quote(title)}",
+                timeout=10)
+            
+            # If the API returns a 404, the lyrics don't exist
+            if r.status_code == 404:
+                return None
+                
+            # For other error status codes, retry
+            r.raise_for_status()
+            
+            # Check if we have valid JSON and "lyrics" in the response
+            data = r.json()
+            if "lyrics" not in data:
+                logging.warning(f"Aucune parole trouvée pour {artist} - {title}")
+                return None
+                
+            return data["lyrics"]
+            
+        except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+            logging.error(f"Erreur lors de la récupération des paroles pour {artist} - {title} "
+                         f"(tentative {attempt+1}/{max_attempts}): {e}")
+            if attempt < max_attempts - 1:
+                logging.info("Attente de 60 secondes avant nouvelle tentative...")
+                time.sleep(60)  # Wait 1 minute before retrying
+            else:
+                logging.error(f"Échec de la récupération des paroles pour {artist} - {title} "
+                             f"après plusieurs tentatives")
+                return None
 
 
 # ---------- collecte ----------
@@ -307,21 +359,71 @@ for genre, artist in ARTISTS:
 
     for alb in albs:
         yr = year_range(alb["year"])
-        folder = os.path.join(ROOT_DIR, yr, sanitize(
-            genre), f"{sanitize(alb['title'])}-artist-{sanitize(artist)}")
-        os.makedirs(folder, exist_ok=True)
-        for tr in alb["tracks"]:
-            lyr = lyrics(artist, tr)
-            if not lyr:
-                continue
-            with open(os.path.join(folder, sanitize(tr) + ".txt"), "w", encoding="utf-8") as f:
-                f.write(lyr)
-            time.sleep(SLEEP)
-        report[artist]["albums"].append(alb["title"])
-    report[artist]["status"] = "complet"
+        try:
+            folder = os.path.join(ROOT_DIR, yr, sanitize(
+                genre), f"{sanitize(alb['title'])}-artist-{sanitize(artist)}")
+            os.makedirs(folder, exist_ok=True)
+            
+            tracks_with_lyrics = 0
+            for tr in alb["tracks"]:
+                try:
+                    lyr = lyrics(artist, tr)
+                    if not lyr:
+                        logging.warning(f"Pas de paroles pour {artist} - {tr}")
+                        continue
+                        
+                    file_path = os.path.join(folder, sanitize(tr) + ".txt")
+                    try:
+                        with open(file_path, "w", encoding="utf-8") as f:
+                            f.write(lyr)
+                        tracks_with_lyrics += 1
+                    except IOError as e:
+                        logging.error(f"Erreur lors de l'écriture du fichier {file_path}: {e}")
+                        # Wait and try again if it's a temporary issue
+                        time.sleep(60)
+                        try:
+                            with open(file_path, "w", encoding="utf-8") as f:
+                                f.write(lyr)
+                            tracks_with_lyrics += 1
+                            logging.info(f"Réussite de l'écriture du fichier {file_path} après attente")
+                        except IOError as e2:
+                            logging.error(f"Échec persistant d'écriture du fichier {file_path}: {e2}")
+                except Exception as e:
+                    logging.error(f"Erreur lors du traitement de la piste {tr} pour {artist}: {e}")
+                    continue
+                
+                time.sleep(SLEEP)
+                
+            if tracks_with_lyrics > 0:
+                report[artist]["albums"].append(alb["title"])
+                logging.info(f"Album {alb['title']} : {tracks_with_lyrics} pistes avec paroles")
+            else:
+                logging.warning(f"Album {alb['title']} : aucune piste avec paroles")
+                
+        except Exception as e:
+            logging.error(f"Erreur lors du traitement de l'album {alb.get('title', 'inconnu')} pour {artist}: {e}")
+            continue
+            
+    if report[artist]["albums"]:
+        report[artist]["status"] = "complet"
+        logging.info(f"Artiste {artist} complété avec {len(report[artist]['albums'])} albums")
+    else:
+        logging.warning(f"Aucun album avec paroles pour {artist}")
     logging.info("OK")
 
-with open(REPORT, "w", encoding="utf-8") as f:
-    json.dump(report, f, ensure_ascii=False, indent=2)
+try:
+    with open(REPORT, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    logging.info(f"Rapport de collecte écrit dans {REPORT}")
+except IOError as e:
+    logging.error(f"Erreur lors de l'écriture du rapport: {e}")
+    # Try again after waiting
+    time.sleep(60)
+    try:
+        with open(REPORT, "w", encoding="utf-8") as f:
+            json.dump(report, f, ensure_ascii=False, indent=2)
+        logging.info(f"Rapport de collecte écrit dans {REPORT} après attente")
+    except IOError as e2:
+        logging.error(f"Échec persistant d'écriture du rapport: {e2}")
 
 logging.info("Collecte terminée")
