@@ -10,4 +10,4 @@ from utils.data_loader import (
     get_label_from_metadata
 )
 from utils.vectorizers import TextVectorizer
-from utils.models import TextClassifier, plot_confusion_matrix, evaluate_multiple_embeddings 
+from utils.models import TextClassifier, plot_confusion_matrix, evaluate_multiple_embeddings

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Dataset creation and collection utilities for lyrics project.
+"""
 import os
 import re
 import time
@@ -27,10 +30,13 @@ logging.basicConfig(
 )
 
 
-def sanitize(name): return re.sub(r'[\\/*?:"<>|]', "", name)
+def sanitize(name):
+    """Remove forbidden characters from file/folder names."""
+    return re.sub(r'[\\/*?:"<>|]', "", name)
 
 
 def year_range(y):
+    """Return a string representing the year range for a given year."""
     try:
         y = int(str(y)[:4])
     except:
@@ -51,6 +57,7 @@ def year_range(y):
 
 
 def sp_token():
+    """Get a Spotify API token."""
     cid = CID
     secret = SECRET
     if not cid or not secret:
@@ -76,6 +83,7 @@ def sp_token():
 
 
 def sp_get(url, token):
+    """Make a GET request to the Spotify API with retries."""
     max_attempts = 3
     for attempt in range(max_attempts):
         try:
@@ -93,6 +101,7 @@ def sp_get(url, token):
 
 
 def sp_artist_id(token, name):
+    """Get Spotify artist ID from artist name."""
     try:
         q = urllib.parse.quote(name)
         js = sp_get(
@@ -105,6 +114,7 @@ def sp_artist_id(token, name):
 
 
 def sp_top_albums(token, artist_id):
+    """Get top albums for a Spotify artist."""
     albums, seen = [], set()
     try:
         js = sp_get(
@@ -144,6 +154,7 @@ MB_HEADERS = {"User-Agent": "LyricsDataset/2.0 (contact@example.com)"}
 
 
 def mb_artist_id(name):
+    """Get MusicBrainz artist ID from artist name."""
     max_attempts = 3
     for attempt in range(max_attempts):
         try:

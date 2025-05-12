@@ -21,7 +21,7 @@ class TextGenerator:
         self.max_length = kwargs.get("max_length", 100)
         
     def fit(self, texts: List[str], tokenized_texts: Optional[List[List[str]]] = None) -> None:
-        """Entraîne le modèle de génération sur les textes donnés"""
+        """Train the generation model on the given texts."""
         if tokenized_texts is None:
             tokenized_texts = [text.split() for text in texts]
             
@@ -34,7 +34,7 @@ class TextGenerator:
         elif self.generator_type == "transformer":
             self._train_transformer(texts)
         else:
-            raise ValueError(f"Type de générateur non supporté: {self.generator_type}")
+            raise ValueError(f"Unsupported generator type: {self.generator_type}")
     
     def _train_ngram(self, tokenized_texts: List[List[str]]) -> None:
         """Implémente un modèle n-gram pour la génération de texte"""
@@ -87,9 +87,9 @@ class TextGenerator:
         self.model = AutoModelForCausalLM.from_pretrained("distilgpt2")
     
     def generate(self, prompt: str = "", max_length: int = None) -> str:
-        """Génère du texte à partir d'un prompt donné"""
+        """Generate text from a given prompt."""
         if self.model is None:
-            raise ValueError("Modèle non entraîné. Appelez fit() d'abord.")
+            raise ValueError("Model not trained. Call fit() first.")
         
         if max_length is None:
             max_length = self.max_length
@@ -101,7 +101,7 @@ class TextGenerator:
         elif self.generator_type == "transformer":
             return self._generate_transformer(prompt, max_length)
         else:
-            raise ValueError(f"Type de générateur non supporté: {self.generator_type}")
+            raise ValueError(f"Unsupported generator type: {self.generator_type}")
     
     def _generate_ngram(self, prompt: str, max_length: int) -> str:
         """Génère du texte avec le modèle n-gram"""
@@ -185,14 +185,14 @@ class TextGenerator:
         return self.tokenizer.decode(output_sequences[0], skip_special_tokens=True)
     
     def evaluate(self, test_texts: List[str], metric: str = "perplexity") -> float:
-        """Évalue le modèle de génération sur les textes de test"""
+        """Evaluate the generation model on test texts."""
         if self.model is None:
-            raise ValueError("Modèle non entraîné. Appelez fit() d'abord.")
+            raise ValueError("Model not trained. Call fit() first.")
             
         if metric == "perplexity":
             return self._calculate_perplexity(test_texts)
         else:
-            raise ValueError(f"Métrique d'évaluation non supportée: {metric}")
+            raise ValueError(f"Unsupported evaluation metric: {metric}")
     
     def _calculate_perplexity(self, test_texts: List[str]) -> float:
         """Calcule la perplexité du modèle sur les textes de test"""
@@ -231,7 +231,7 @@ class TextGenerator:
             return 0.0  # Placeholder
 
 def benchmark_generation_models(texts: List[str], generator_types: List[str] = None):
-    """Compare différents modèles de génération"""
+    """Compare different generation models."""
     if generator_types is None:
         generator_types = ["ngram", "word2vec", "fasttext", "transformer"]
         

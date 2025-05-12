@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
+"""
+Model interpretation utilities for text classification models.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -20,31 +21,31 @@ import time
 import os
 
 class ModelInterpreter:
-    """Classe pour interpréter les modèles de classification de texte"""
+    """Class for interpreting text classification models."""
     
     def __init__(self, model, vectorizer=None):
-        """Initialise l'interpréteur de modèle"""
+        """Initialize the model interpreter."""
         self.model = model
         self.vectorizer = vectorizer
         
     def get_feature_importance(self, method: str = "coefficients"):
-        """Récupère l'importance des features selon différentes méthodes"""
+        """Get feature importance using different methods."""
         if method == "coefficients" and hasattr(self.model, "coef_"):
             return self._get_coefficient_importance()
         elif method == "permutation":
-            raise ValueError("La méthode 'permutation' nécessite des données X et y")
+            raise ValueError("The 'permutation' method requires X and y data.")
         elif method == "shap":
-            raise ValueError("La méthode 'shap' nécessite des données X")
+            raise ValueError("The 'shap' method requires X data.")
         else:
-            raise ValueError(f"Méthode d'importance non supportée: {method}")
+            raise ValueError(f"Unsupported importance method: {method}")
             
     def _get_coefficient_importance(self):
-        """Récupère l'importance des features basée sur les coefficients"""
+        """Get feature importance based on model coefficients."""
         if not hasattr(self.model, "coef_"):
-            raise ValueError("Le modèle n'a pas d'attribut 'coef_'")
+            raise ValueError("Model has no 'coef_' attribute.")
             
         if not self.vectorizer:
-            raise ValueError("Vectorizer non fourni, impossible d'associer les features")
+            raise ValueError("Vectorizer not provided, cannot match features.")
             
         try:
             # Récupérer les coefficients
@@ -76,14 +77,14 @@ class ModelInterpreter:
             
             return sorted_importance
         except Exception as e:
-            print(f"Erreur lors de l'extraction de l'importance des features: {str(e)}")
+            print(f"Error extracting feature importance: {str(e)}")
             # Retourner une liste vide si erreur
             return []
     
     def explain_prediction(self, text: str, num_features: int = 10):
-        """Explique la prédiction pour un texte donné"""
+        """Explain the prediction for a given text."""
         if not self.vectorizer:
-            raise ValueError("Vectorizer non fourni, impossible d'expliquer la prédiction")
+            raise ValueError("Vectorizer not provided, cannot explain prediction.")
             
         # Vectoriser le texte
         X = self.vectorizer.transform([text])
@@ -98,10 +99,10 @@ class ModelInterpreter:
         elif hasattr(self.model, "feature_importances_"):
             return self._explain_tree_prediction(text, prediction, num_features)
         else:
-            return {"prediction": prediction, "explanation": "Modèle non supporté pour l'explication"}
+            return {"prediction": prediction, "explanation": "Model not supported for explanation."}
     
     def _explain_linear_prediction(self, text: str, prediction: Any, num_features: int = 10):
-        """Explique la prédiction d'un modèle linéaire"""
+        """Explain prediction for a linear model."""
         # Vectoriser le texte
         X = self.vectorizer.transform([text])
         
@@ -155,7 +156,7 @@ class ModelInterpreter:
             }
     
     def _explain_tree_prediction(self, text: str, prediction: Any, num_features: int = 10):
-        """Explique la prédiction d'un modèle basé sur les arbres"""
+        """Explain prediction for a tree-based model."""
         # Vectoriser le texte
         X = self.vectorizer.transform([text])
         
@@ -183,7 +184,7 @@ class ModelInterpreter:
         }
     
     def explain_with_lime(self, text: str, num_features: int = 10, num_samples: int = 1000):
-        """Explique la prédiction avec LIME (Local Interpretable Model-agnostic Explanations)"""
+        """Explain prediction with LIME (Local Interpretable Model-agnostic Explanations)."""
         # Créer une fonction de prédiction pour le pipeline modèle+vectorizer
         def predict_proba_fn(texts):
             vectorized_texts = self.vectorizer.transform(texts)
@@ -225,7 +226,7 @@ class ModelInterpreter:
         }
     
     def explain_with_shap(self, X, num_samples: int = 100):
-        """Explique le modèle avec SHAP (SHapley Additive exPlanations)"""
+        """Explain the model with SHAP (SHapley Additive exPlanations)."""
         # Créer un explainer SHAP
         if hasattr(self.model, "coef_"):
             # Pour les modèles linéaires

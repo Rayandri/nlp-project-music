@@ -26,24 +26,17 @@ def predict_lyrics(text):
     """Predict artist from lyrics text."""
     if not check_model_exists():
         return "Modèle non trouvé", []
-    
     try:
         classifier, vectorizer = TextClassifier.load_model(MODEL_PATH)
-        
         X = vectorizer.transform([text])
-        
         prediction = classifier.predict(X)[0]
-        
         scores = []
         if hasattr(classifier.model, "predict_proba"):
             probs = classifier.model.predict_proba(X)[0]
             classes = classifier.model.classes_
-            
             sorted_indices = np.argsort(probs)[::-1]
             scores = [(classes[idx], probs[idx]) for idx in sorted_indices[:5]]
-        
         return prediction, scores
-    
     except Exception as e:
         return f"Erreur: {str(e)}", []
 
@@ -54,12 +47,9 @@ def index():
     probabilities = None
     lyrics = ""
     models_ready = check_model_exists()
-    
     if request.method == 'POST':
         lyrics = request.form.get('lyrics', '')
-        
         prediction, probabilities = predict_lyrics(lyrics)
-    
     return render_template(
         'index.html', 
         lyrics=lyrics,
@@ -76,6 +66,5 @@ if __name__ == '__main__':
         import subprocess
         subprocess.check_call([sys.executable, "-m", "pip", "install", "flask"])
         print("Flask installé avec succès.")
-    
     print("Serveur démarré: http://127.0.0.1:5000")
     app.run(debug=True) 
