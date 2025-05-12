@@ -1,70 +1,70 @@
 === Résultats d'Interprétation du Modèle ===
 
 Importance des features (coefficients):
-  la: 0.2354
-  je: 0.2204
-  de: 0.2107
-  les: 0.2091
-  you: 0.2027
-  pas: 0.2007
-  tu: 0.1891
-  on: 0.1846
-  et: 0.1741
-  le: 0.1740
-  est: 0.1714
-  un: 0.1661
-  elle: 0.1603
-  suis: 0.1543
-  que: 0.1531
-  des: 0.1525
-  oh: 0.1522
-  qu: 0.1504
-  dans: 0.1441
-  qui: 0.1413
+  je: 0.4815
+  la: 0.4790
+  de: 0.4590
+  the: 0.4459
+  you: 0.4083
+  les: 0.3995
+  on: 0.3989
+  pas: 0.3808
+  le: 0.3581
+  et: 0.3477
+  est: 0.3390
+  ai: 0.3135
+  des: 0.3061
+  qu: 0.2953
+  oh: 0.2919
+  elle: 0.2854
+  un: 0.2799
+  tu: 0.2783
+  qui: 0.2757
+  que: 0.2688
 
 Importance des features (permutation):
-  la: 0.2354
-  je: 0.2204
-  de: 0.2107
-  les: 0.2091
-  you: 0.2027
-  pas: 0.2007
-  tu: 0.1891
-  on: 0.1846
-  et: 0.1741
-  le: 0.1740
-  est: 0.1714
-  un: 0.1661
-  elle: 0.1603
-  suis: 0.1543
-  que: 0.1531
-  des: 0.1525
-  oh: 0.1522
-  qu: 0.1504
-  dans: 0.1441
-  qui: 0.1413
+  je: 0.4815
+  la: 0.4790
+  de: 0.4590
+  the: 0.4459
+  you: 0.4083
+  les: 0.3995
+  on: 0.3989
+  pas: 0.3808
+  le: 0.3581
+  et: 0.3477
+  est: 0.3390
+  ai: 0.3135
+  des: 0.3061
+  qu: 0.2953
+  oh: 0.2919
+  elle: 0.2854
+  un: 0.2799
+  tu: 0.2783
+  qui: 0.2757
+  que: 0.2688
 
 Comparaison des méthodes d'importance:
 Chevauchement dans le top 20: 20 features
 Features communes:
-  suis
-  dans
+  le
+  on
+  ai
+  les
+  qu
+  des
+  un
+  que
+  la
+  tu
+  je
+  et
+  the
+  de
   est
   oh
-  je
-  tu
-  de
-  et
-  qu
-  un
-  you
-  pas
   qui
-  on
-  des
-  que
-  le
-  les
+  pas
   elle
-  la
+  you
 
