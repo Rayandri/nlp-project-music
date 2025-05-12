@@ -176,3 +176,11 @@ tokenized_lyrics_dataset/
 
 *.pkl
 results/
+
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.npy
