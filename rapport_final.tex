@@ -24,7 +24,16 @@
   stringstyle=\color{red},
   numbers=left,
   numberstyle=\tiny\color{gray},
-  frame=single
+  frame=single,
+  literate=
+    {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\¨e}}1
+    {à}{{\`a}}1 {â}{{\^a}}1 {ä}{{\¨a}}1
+    {î}{{\^i}}1 {ï}{{\¨i}}1
+    {ô}{{\^o}}1 {ö}{{\¨o}}1
+    {ù}{{\`u}}1 {û}{{\^u}}1 {ü}{{\¨u}}1
+    {ç}{{\c c}}1,
+  texcl=true,
+  escapeinside={(*@}{@*)}
 }
 
 \title{\textbf{Analyse et Génération de Paroles de Chansons\\
@@ -129,6 +138,37 @@ Nous avons expérimenté avec plusieurs approches de vectorisation pour représe
     \item \textbf{Transformers} : utilisation de modèles pré-entraînés basés sur l'architecture transformer
 \end{itemize}
 
+\begin{lstlisting}[caption=Extrait du code de classification]
+def run_classification(texts, labels, args):
+    print("\n=== Mode Classification ===")
+    
+    results = {}
+    best_accuracy = 0
+    best_method = None
+    
+    for method in args.vectorizers:
+        print(f"\nMéthode de vectorisation: {method}")
+        vectorizer = TextVectorizer(method=method)
+        X = vectorizer.fit_transform(texts)
+        print(f"Dimensions des vecteurs: {X.shape}")
+        
+        classifier = TextClassifier(model_type=args.classifier)
+        eval_results = classifier.train(
+            X, labels, 
+            test_size=0.2, 
+            random_state=args.random_seed, 
+            stratify=True
+        )
+        
+        accuracy = eval_results["accuracy"]
+        report = eval_results["classification_report"]
+        
+        print(f"Précision: {accuracy:.3f}")
+        print(f"F1-score macro: {report['macro avg']['f1-score']:.3f}")
+        
+        results[method] = eval_results
+\end{lstlisting}
+
 \subsection{Résultats et comparaison}
 Les performances des différentes approches de vectorisation sont présentées dans le tableau ci-dessous :
 
@@ -160,6 +200,28 @@ Ces résultats montrent clairement que la méthode TF-IDF surpasse les autres ap
 
 \subsection{Interface web de démonstration}
 Afin de permettre une utilisation facile de notre modèle de classification, nous avons développé une interface web simple permettant aux utilisateurs de saisir des paroles et d'obtenir une prédiction de l'artiste correspondant.
+
+\begin{lstlisting}[caption=Extrait du code de l'interface web (web\_app.py)]
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    prediction = None
+    probabilities = None
+    lyrics = ""
+    models_ready = check_model_exists()
+    
+    if request.method == 'POST':
+        lyrics = request.form.get('lyrics', '')
+        
+        prediction, probabilities = predict_lyrics(lyrics)
+    
+    return render_template(
+        'index.html', 
+        lyrics=lyrics,
+        prediction=prediction,
+        probabilities=probabilities,
+        models_ready=models_ready
+    )
+\end{lstlisting}
 
 \begin{figure}[ht]
     \centering
@@ -194,6 +256,40 @@ Nous avons expérimenté avec plusieurs approches pour la génération de texte 
     \item \textbf{Transformers} : utilisation de modèles de type GPT adaptés aux paroles françaises
 \end{itemize}
 
+\begin{lstlisting}[caption=Extrait du code de génération]
+def _generate_ngram(self, prompt: str, max_length: int) -> str:
+    """Génère du texte avec le modèle n-gram"""
+    tokens = prompt.split() if prompt else ["<START>"]
+    n = 3  # Tri-gram
+
+    # Générer du texte
+    for _ in range(max_length):
+        # Prendre les n-1 derniers tokens comme préfixe
+        prefix = tuple(tokens[-(n-1):]) if len(tokens) >= n-1 else tuple(tokens + ["<START>"] * (n-1 - len(tokens)))
+        
+        # Si ce préfixe n'existe pas, en choisir un aléatoirement
+        if prefix not in self.model or not self.model[prefix]:
+            if not self.vocab:
+                break
+            next_token = random.choice(list(self.vocab.keys()))
+        else:
+            # Choix pondéré du token suivant
+            candidates = self.model[prefix]
+            next_token = random.choices(
+                list(candidates.keys()),
+                weights=list(candidates.values()),
+                k=1
+            )[0]
+        
+        tokens.append(next_token)
+        
+        # Arrêter si on a généré un token de fin
+        if next_token == "<END>":
+            break
+            
+    return " ".join(tokens)
+\end{lstlisting}
+
 Pour l'évaluation, nous avons principalement utilisé la perplexité comme métrique, bien que des évaluations qualitatives aient également été réalisées.
 
 \section{Approches avancées explorées}
@@ -215,6 +311,50 @@ Nos techniques d'augmentation incluent :
     \item \textbf{Traduction aller-retour} : traduction vers une langue intermédiaire puis retour au français
     \item \textbf{Augmentation contextuelle} : utilisation de modèles de langue pour remplacer des mots
 \end{itemize}
+
+\begin{lstlisting}[caption=Extrait du code d'augmentation de données]
+def augment_dataset(texts, labels, methods=None, factor=0.5, balanced=True):
+    """Augmente un dataset complet avec un facteur donné"""
+    
+    augmenter = DataAugmenter()
+    augmented_texts = []
+    augmented_labels = []
+    
+    # Calculer le nombre d'exemples à ajouter
+    num_new_examples = int(len(texts) * factor)
+    
+    if balanced:
+        # Augmentation équilibrée entre les classes
+        label_counts = Counter(labels)
+        label_indices = {label: [i for i, l in enumerate(labels) if l == label] for label in set(labels)}
+        
+        # Calculer le nombre d'exemples à ajouter par classe
+        examples_per_class = {}
+        for label in label_counts:
+            # Classes minoritaires reçoivent plus d'augmentations
+            inverse_freq = 1 / label_counts[label]
+            examples_per_class[label] = int(num_new_examples * inverse_freq / sum(1/count for count in label_counts.values()))
+        
+        # Augmenter chaque classe
+        for label, num_examples in examples_per_class.items():
+            indices = label_indices[label]
+            
+            # Limiter à ce qui est disponible
+            num_examples = min(num_examples, len(indices) * 3)
+            
+            for _ in range(num_examples):
+                idx = random.choice(indices)
+                text = texts[idx]
+                augmented = augmenter.augment(text, methods, num_augmentations=1)[0]
+                augmented_texts.append(augmented)
+                augmented_labels.append(label)
+    
+    # Combiner avec le dataset original
+    all_texts = texts + augmented_texts
+    all_labels = labels + augmented_labels
+    
+    return all_texts, all_labels
+\end{lstlisting}
 
 \subsubsection{Impact sur les performances}
 L'augmentation de données a montré un impact significatif sur les performances, comme le montrent les résultats suivants :
