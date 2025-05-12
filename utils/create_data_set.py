@@ -151,16 +151,42 @@ def lyrics(artist, title):
 
 # ---------- collecte ----------
 ARTISTS = [
-    ("Rap", "Booba"), ("Rap", "PNL"), ("Rap", "Kaaris"), ("Rap", "La Fouine"),
-    ("Rap", "Orelsan"), ("Rap", "SCH"), ("Rap", "Lomepal"), ("Rap", "Nekfeu"),
-    ("Rap", "Lacrim"), ("Rap", "Jul"),
-    ("Musique française", "Zaz"), ("Musique française", "Indochine"),
-    ("Musique française", "M. Pokora"), ("Musique française", "Amir"),
-    ("Musique française", "Vianney"),
-    ("Rock français", "Noir Désir"), ("Rock français", "Trust"),
-    ("Rock français", "Téléphone"), ("Rock français", "BB Brunes"),
-    ("Chanson française", "Édith Piaf"), ("Chanson française", "Jacques Brel"),
+    # ---------- Rap ----------
+    ("Rap", "Booba"), ("Rap", "PNL"), ("Rap", "Orelsan"),
+    ("Rap", "Damso"), ("Rap", "Ninho"), ("Rap", "SCH"),
+
+    # ---------- Pop française ----------
+    ("Pop française", "Angèle"), ("Pop française", "Aya Nakamura"),
+    ("Pop française", "Clara Luciani"), ("Pop française", "Louane"),
+    ("Pop française", "Julien Doré"), ("Pop française", "Vianney"),
+
+    # ---------- Rock français ----------
+    ("Rock français", "Noir Désir"), ("Rock français", "Indochine"),
+    ("Rock français", "Téléphone"), ("Rock français", "Matmatah"),
+    ("Rock français", "Shaka Ponk"), ("Rock français", "Saez"),
+
+    # ---------- Metal français ----------
+    ("Metal", "Gojira"), ("Metal", "Mass Hysteria"),
+    ("Metal", "Dagoba"), ("Metal", "AqME"), ("Metal", "Eths"),
+
+    # ---------- R&B / Soul ----------
+    ("R&B", "Tayc"), ("R&B", "Dadju"),
+    ("R&B", "Shy'm"), ("R&B", "Amel Bent"), ("R&B", "Slimane"),
+
+    # ---------- Electro ----------
+    ("Electro", "Daft Punk"), ("Electro", "David Guetta"),
+    ("Electro", "Martin Solveig"), ("Electro", "Vitalic"),
+    ("Electro", "M83"),
+
+    # ---------- Reggae ----------
+    ("Reggae", "Tryo"), ("Reggae", "Danakil"),
+    ("Reggae", "Naâman"), ("Reggae", "Pierpoljak"),
+    ("Reggae", "Dub Inc"),
+
+    # ---------- Chanson française ----------
+    ("Chanson française", "Serge Gainsbourg"), ("Chanson française", "Jacques Brel"),
     ("Chanson française", "Charles Aznavour"), ("Chanson française", "Francis Cabrel"),
+    ("Chanson française", "Renaud"), ("Chanson française", "Zaz"),
 ]
 
 token = sp_token()
