@@ -15,6 +15,8 @@ import eli5
 from eli5.sklearn import PermutationImportance
 from collections import defaultdict
 from wordcloud import WordCloud
+from joblib import Parallel, delayed
+import time
 
 class ModelInterpreter:
     """Classe pour interpréter les modèles de classification de texte"""
@@ -306,22 +308,54 @@ class ModelInterpreter:
     
     def permutation_feature_importance(self, X, y, n_repeats: int = 10, random_state: int = 42):
         """Calcule l'importance des features par permutation"""
-        # Calculer l'importance par permutation
+        start_time = time.time()
+        
+        # Réduire le nombre de features si trop grand
+        max_features = 5000  # Limiter le nombre de features pour accélérer
+        if hasattr(self.vectorizer, 'get_feature_names_out'):
+            feature_names = self.vectorizer.get_feature_names_out()
+        else:
+            feature_names = self.vectorizer.get_feature_names()
+            
+        print(f"Total features: {len(feature_names)}")
+        
+        # Si le nombre de features est très élevé, sélectionnez les plus importantes
+        if X.shape[1] > max_features and hasattr(self.model, "coef_"):
+            print(f"Selecting top {max_features} features based on model coefficients")
+            coefs = np.abs(self.model.coef_)
+            if coefs.ndim > 1:  # Si multi-classe
+                coefs = np.mean(coefs, axis=0)
+            
+            # Sélectionner les features les plus importantes
+            top_indices = np.argsort(coefs)[-max_features:]
+            X_reduced = X[:, top_indices]
+            selected_feature_names = [feature_names[i] for i in top_indices]
+            print(f"Reduced feature dimensionality: {X.shape[1]} -> {X_reduced.shape[1]}")
+            X = X_reduced
+            feature_names = selected_feature_names
+        
+        # Utiliser joblib pour paralléliser le calcul
+        print(f"Running permutation importance with {n_repeats} repeats...")
+        start_perm = time.time()
+        
+        # Calculer l'importance par permutation avec n_jobs=-1 (utiliser tous les cœurs)
         perm_importance = permutation_importance(
             self.model, X, y, 
             n_repeats=n_repeats,
-            random_state=random_state
+            random_state=random_state,
+            n_jobs=-1  # Utiliser tous les cœurs disponibles
         )
+        
+        print(f"Permutation calculation took {time.time() - start_perm:.2f} seconds")
         
         # Récupérer les moyennes
         importances = perm_importance.importances_mean
         
         # Associer aux noms des features
-        feature_names = self.vectorizer.get_feature_names_out()
-        
-        # Créer un dictionnaire trié
         feature_importance = dict(zip(feature_names, importances))
         sorted_importance = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
+        
+        print(f"Total permutation importance calculation took {time.time() - start_time:.2f} seconds")
         
         return sorted_importance
     

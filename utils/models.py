@@ -8,6 +8,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
+import time
 
 class TextClassifier:
     def __init__(self, model_type: str = "logistic", **kwargs):
@@ -41,6 +42,8 @@ class TextClassifier:
     
     def train(self, X: np.ndarray, y: List[str], test_size: float = 0.2, 
              random_state: int = 42, stratify: bool = True) -> Dict[str, Any]:
+        start_time = time.time()
+        
         # Check label distribution
         class_counts = Counter(y)
         min_count = min(class_counts.values())
@@ -64,19 +67,28 @@ class TextClassifier:
             X, y, test_size=test_size, random_state=random_state, stratify=stratify_data
         )
         
-        # Optional: cross-validation score
-        cv_scores = cross_val_score(self.model, X_train, y_train, cv=5)
+        print(f"Split data in {time.time() - start_time:.2f} seconds")
+        cv_start = time.time()
+        
+        # Optional: cross-validation score with parallelization
+        cv_scores = cross_val_score(self.model, X_train, y_train, cv=5, n_jobs=-1)
         print(f"Cross-validation score: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
+        print(f"Cross-validation completed in {time.time() - cv_start:.2f} seconds")
         
         # Train model
+        fit_start = time.time()
         self.model.fit(X_train, y_train)
+        print(f"Model fitting completed in {time.time() - fit_start:.2f} seconds")
         
         # Evaluate
+        eval_start = time.time()
         y_pred = self.model.predict(X_test)
         accuracy = accuracy_score(y_test, y_pred)
         report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
         
         cm = confusion_matrix(y_test, y_pred)
+        print(f"Evaluation completed in {time.time() - eval_start:.2f} seconds")
+        print(f"Total training pipeline completed in {time.time() - start_time:.2f} seconds")
         
         return {
             "accuracy": accuracy,

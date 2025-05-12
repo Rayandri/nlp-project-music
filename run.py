@@ -11,6 +11,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import Counter
+import time  # Add time module for logging
 
 from utils.tokenizer import BPETokenizer
 from utils.data_loader import load_lyrics_dataset, save_tokenized_lyrics, get_label_from_metadata, cross_dataset_validation
@@ -222,12 +223,20 @@ def run_augmentation(texts, labels, args):
 def run_interpretation(texts, labels, args):
     print("\n=== Mode Interprétation ===")
     
+    start_total = time.time()
+    
     # Vectoriser et entraîner un modèle
+    print("Vectorizing data...")
+    start_vectorize = time.time()
     vectorizer = TextVectorizer(method="tfidf")
     X = vectorizer.fit_transform(texts)
+    print(f"Vectorization completed in {time.time() - start_vectorize:.2f} seconds")
     
+    print("Training classifier...")
+    start_train = time.time()
     classifier = TextClassifier(model_type=args.classifier)
     classifier.train(X, labels, test_size=0.2, random_state=args.random_seed)
+    print(f"Training completed in {time.time() - start_train:.2f} seconds")
     
     # Créer l'interpréteur
     interpreter = ModelInterpreter(classifier.model, vectorizer)
@@ -235,6 +244,7 @@ def run_interpretation(texts, labels, args):
     # Interprétation basée sur les coefficients
     if "coefficients" in args.interpretation and hasattr(classifier.model, "coef_"):
         print("\nAnalyse de l'importance des features (coefficients):")
+        start_coef = time.time()
         try:
             top_features = interpreter.get_feature_importance(method="coefficients")
             if top_features:
@@ -249,57 +259,83 @@ def run_interpretation(texts, labels, args):
                     wordcloud_fig.savefig(wordcloud_path)
                     print(f"Nuage de mots sauvegardé: {wordcloud_path}")
                 except Exception as e:
-                    print(f"Erreur lors de la génération du nuage de mots: {e}")
-            else:
-                print("  Aucune feature importante trouvée.")
+                    print(f"Erreur lors de la génération du nuage de mots: {str(e)}")
         except Exception as e:
-            print(f"  Erreur lors de l'analyse des coefficients: {e}")
+            print(f"Erreur lors de l'analyse de l'importance des features: {str(e)}")
+        print(f"Coefficient importance analysis completed in {time.time() - start_coef:.2f} seconds")
     
     # Interprétation basée sur la permutation
     if "permutation" in args.interpretation:
         print("\nAnalyse de l'importance des features (permutation):")
+        start_perm = time.time()
         try:
-            perm_importance = interpreter.permutation_feature_importance(X, labels, n_repeats=5)
-            if perm_importance:
-                for feature, importance in perm_importance[:10]:
-                    print(f"  {feature}: {importance:.4f}")
-            else:
-                print("  Aucune feature importante trouvée.")
-        except Exception as e:
-            print(f"  Erreur lors du calcul de l'importance par permutation: {e}")
-    
-    # Exemple d'explication d'une prédiction
-    if texts:
-        example_text = texts[0][:500]  # Limiter la longueur pour l'affichage
-        print(f"\nExplication de prédiction pour un exemple:")
-        try:
-            explanation = interpreter.explain_prediction(example_text, num_features=5)
-            print(f"  Prédiction: {explanation['prediction']}")
-            print("  Top features contribuant à la prédiction:")
-            if "top_features" in explanation and explanation["top_features"]:
-                for feature, contribution in explanation["top_features"]:
-                    print(f"    {feature}: {contribution:.4f}")
-            else:
-                print("    Aucune feature importante trouvée.")
-        except Exception as e:
-            print(f"  Erreur lors de l'explication de la prédiction: {e}")
+            # Limiter à un sous-ensemble pour accélérer (par exemple, 30% des données)
+            sample_size = min(1000, int(X.shape[0] * 0.3))
+            indices = np.random.choice(X.shape[0], sample_size, replace=False)
+            X_sample = X[indices]
+            y_sample = [labels[i] for i in indices]
             
-    # Si LIME est demandé
+            print(f"Running permutation importance on {sample_size} samples...")
+            perm_features = interpreter.permutation_feature_importance(X_sample, y_sample, n_repeats=5)
+            
+            if perm_features:
+                for feature, importance in perm_features[:10]:
+                    print(f"  {feature}: {importance:.4f}")
+                
+                # Comparer avec les résultats des coefficients
+                if "coefficients" in args.interpretation and hasattr(classifier.model, "coef_"):
+                    print("\nComparaison des méthodes d'importance:")
+                    coef_features = set([f for f, _ in top_features[:20]])
+                    perm_features_set = set([f for f, _ in perm_features[:20]])
+                    overlap = coef_features.intersection(perm_features_set)
+                    print(f"Chevauchement dans le top 20: {len(overlap)} features")
+        except Exception as e:
+            print(f"Erreur lors de l'analyse de l'importance par permutation: {str(e)}")
+        print(f"Permutation importance analysis completed in {time.time() - start_perm:.2f} seconds")
+    
+    # Interprétation avec LIME
     if "lime" in args.interpretation:
         print("\nExplication avec LIME:")
+        start_lime = time.time()
         try:
-            from lime.lime_text import LimeTextExplainer
+            # Choisir un exemple aléatoire
+            sample_idx = np.random.randint(0, len(texts))
+            sample_text = texts[sample_idx]
+            sample_label = labels[sample_idx]
             
-            if texts:
-                lime_expl = interpreter.explain_with_lime(texts[0][:500], num_features=5, num_samples=100)
-                print(f"  Prédiction: {lime_expl['prediction']}")
-                print("  Explications LIME:")
-                for feature, weight in lime_expl["explanations"]:
-                    print(f"    {feature}: {weight:.4f}")
-        except ImportError:
-            print("  Lime n'est pas installé. Utilisez: pip install lime")
+            # Obtenir l'explication LIME
+            lime_explanation = interpreter.explain_with_lime(sample_text, num_features=10)
+            
+            print(f"Texte: {sample_text[:100]}...")
+            print(f"Label réel: {sample_label}")
+            print(f"Prédiction: {lime_explanation['prediction']}")
+            print("Top features explicatives:")
+            for feature, weight in lime_explanation["explanations"]:
+                print(f"  {feature}: {weight:.4f}")
         except Exception as e:
-            print(f"  Erreur lors de l'explication avec LIME: {e}")
+            print(f"Erreur lors de l'explication avec LIME: {str(e)}")
+        print(f"LIME explanation completed in {time.time() - start_lime:.2f} seconds")
+    
+    # Interprétation avec SHAP
+    if "shap" in args.interpretation:
+        print("\nExplication avec SHAP:")
+        start_shap = time.time()
+        try:
+            # Utiliser un sous-ensemble pour accélérer
+            sample_size = min(100, X.shape[0])
+            indices = np.random.choice(X.shape[0], sample_size, replace=False)
+            X_sample = X[indices]
+            
+            # Calculer les valeurs SHAP
+            shap_values = interpreter.explain_with_shap(X_sample, num_samples=50)
+            
+            # Afficher les résultats
+            print("Analyse SHAP complétée.")
+        except Exception as e:
+            print(f"Erreur lors de l'explication avec SHAP: {str(e)}")
+        print(f"SHAP explanation completed in {time.time() - start_shap:.2f} seconds")
+    
+    print(f"\nTotal interpretation time: {time.time() - start_total:.2f} seconds")
 
 def run_cross_validation(args):
     """Mode de validation croisée entre datasets"""
