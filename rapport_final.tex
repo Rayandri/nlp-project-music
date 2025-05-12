@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
+\usepackage[margin=0.4in, top=0.25in, bottom=0.2in, headheight=5pt, footskip=5pt]{geometry}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -11,8 +12,6 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{subcaption}
-
-\usepackage[margin=2cm]{geometry}
 
 \lstset{
   language=Python,
@@ -201,28 +200,6 @@ Ces résultats montrent clairement que la méthode TF-IDF surpasse les autres ap
 \subsection{Interface web de démonstration}
 Afin de permettre une utilisation facile de notre modèle de classification, nous avons développé une interface web simple permettant aux utilisateurs de saisir des paroles et d'obtenir une prédiction de l'artiste correspondant.
 
-\begin{lstlisting}[caption=Extrait du code de l'interface web (web\_app.py)]
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    prediction = None
-    probabilities = None
-    lyrics = ""
-    models_ready = check_model_exists()
-    
-    if request.method == 'POST':
-        lyrics = request.form.get('lyrics', '')
-        
-        prediction, probabilities = predict_lyrics(lyrics)
-    
-    return render_template(
-        'index.html', 
-        lyrics=lyrics,
-        prediction=prediction,
-        probabilities=probabilities,
-        models_ready=models_ready
-    )
-\end{lstlisting}
-
 \begin{figure}[ht]
     \centering
     \begin{subfigure}[b]{0.8\textwidth}
@@ -311,50 +288,6 @@ Nos techniques d'augmentation incluent :
     \item \textbf{Traduction aller-retour} : traduction vers une langue intermédiaire puis retour au français
     \item \textbf{Augmentation contextuelle} : utilisation de modèles de langue pour remplacer des mots
 \end{itemize}
-
-\begin{lstlisting}[caption=Extrait du code d'augmentation de données]
-def augment_dataset(texts, labels, methods=None, factor=0.5, balanced=True):
-    """Augmente un dataset complet avec un facteur donné"""
-    
-    augmenter = DataAugmenter()
-    augmented_texts = []
-    augmented_labels = []
-    
-    # Calculer le nombre d'exemples à ajouter
-    num_new_examples = int(len(texts) * factor)
-    
-    if balanced:
-        # Augmentation équilibrée entre les classes
-        label_counts = Counter(labels)
-        label_indices = {label: [i for i, l in enumerate(labels) if l == label] for label in set(labels)}
-        
-        # Calculer le nombre d'exemples à ajouter par classe
-        examples_per_class = {}
-        for label in label_counts:
-            # Classes minoritaires reçoivent plus d'augmentations
-            inverse_freq = 1 / label_counts[label]
-            examples_per_class[label] = int(num_new_examples * inverse_freq / sum(1/count for count in label_counts.values()))
-        
-        # Augmenter chaque classe
-        for label, num_examples in examples_per_class.items():
-            indices = label_indices[label]
-            
-            # Limiter à ce qui est disponible
-            num_examples = min(num_examples, len(indices) * 3)
-            
-            for _ in range(num_examples):
-                idx = random.choice(indices)
-                text = texts[idx]
-                augmented = augmenter.augment(text, methods, num_augmentations=1)[0]
-                augmented_texts.append(augmented)
-                augmented_labels.append(label)
-    
-    # Combiner avec le dataset original
-    all_texts = texts + augmented_texts
-    all_labels = labels + augmented_labels
-    
-    return all_texts, all_labels
-\end{lstlisting}
 
 \subsubsection{Impact sur les performances}
 L'augmentation de données a montré un impact significatif sur les performances, comme le montrent les résultats suivants :
