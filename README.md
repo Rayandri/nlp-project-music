@@ -85,7 +85,7 @@ python run.py --mode generate
 python run.py --mode cross_validate
 ```
 
-### Options communes
+### Options Communes
 
 ```bash
 # Spécifier le répertoire de sortie des résultats
