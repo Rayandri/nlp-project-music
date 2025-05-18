@@ -1,4 +1,3 @@
-[Couplet 1]
 On finit bêtes à la fin de nos soirées
 On fait la fête jusqu'à ce que l'un de nous soit raide
 Y'avait du monde mais je l'ai vu apparaître
@@ -20,9 +19,6 @@ Elle dansera jusqu'à 6, longue nuit
 Elle danse comme si elle en avait envie
 
 
-
-[Refrain] ×2
-
 Elle danse comme si elle en avait envie
 
 Elle danse comme si elle en avait envie
@@ -31,9 +27,6 @@ Elle danse comme si elle en avait envie
 
 Au moins, elle est en vie
 
-
-
-[Couplet 2]
 
 Elle danse dans une boîte dans les bas-fonds
 
@@ -69,12 +62,6 @@ C'est mieux de recevoir un verre que recevoir un bleu"
 
 
 
-[Refrain] ×2
-
-
-
-[Pont] ×2
-
 Deux grammes dans le sang, deux dans le nez
 
 Tape, tape, tape, tape, tape dans le néant
@@ -83,9 +70,6 @@ Deux grammes dans le sang, deux dans le nez
 
 Tape, tape, tape, tape, tape sous les néons
 
-
-
-[Couplet 3]
 
 Je l'ai jamais revu, pourtant j'y pense tous les soirs
 
@@ -111,6 +95,3 @@ Dans cette vie sans coloris, les cuisses endolories
 
 Plongée dans ses pensées colériques, elle danse et colle au rythme
 
-
-
-[Refrain] ×2

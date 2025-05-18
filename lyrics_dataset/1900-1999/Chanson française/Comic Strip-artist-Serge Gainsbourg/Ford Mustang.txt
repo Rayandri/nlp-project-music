@@ -1,4 +1,5 @@
-{Refrain:}
+
+}
 On s'fait des langues
 En Ford Mustang
 Et bang !
@@ -10,8 +11,6 @@ Les platanes
 "Tang" à droite
 
 Et à gauche, à droite
-
-
 
 Un essuie-glace
 
@@ -28,9 +27,6 @@ Une barre de
 Chocolat
 
 Un Coca-Cola
-
-{au Refrain}
-
 
 
 Une bouteille
@@ -49,9 +45,6 @@ D'Edgard Poe
 
 Un briquet Zippo
 
-{au Refrain}
-
-
 
 Un numéro
 
@@ -69,4 +62,3 @@ d'Marilyn
 
 Un tube d'aspirine
 
-{au Refrain}

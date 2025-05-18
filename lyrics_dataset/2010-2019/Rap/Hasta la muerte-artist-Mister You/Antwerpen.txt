@@ -1,6 +1,5 @@
 [Tag]
 Hades
-[Refrain]
 Quarante kilos qui m'attendent vers le port d’Anvers
 J'ai des tas de billets bleus à repeindre en vert
 
@@ -18,9 +17,6 @@ J’suis du ghetto, m’faut des espèces, j'suis un raclo d’la pire espèce
 
 D'après l'Etat j'suis space, il m’faut d'l'oseille comme dans Scarface
 
-
-
-[Couplet 1]
 
 Dans ma tess, oui, j'suis khapta, oui
 
@@ -47,9 +43,6 @@ J'suis comme la Bête, j'rêve toujours de m'faire la Belle
 J'ai rien à perdre baby, j'taffe qu'avec mes frères
 
 
-
-[Refrain]
-
 Quarante kilos qui m'attendent vers le port d'Anvers
 
 J'ai des tas de billets bleus à repeindre en vert
@@ -68,9 +61,6 @@ J'suis du ghetto, m'faut des espèces, j'suis un raclo d'la pire espèce
 
 D'après l'Etat j'suis space, il m'faut d'l'oseille comme dans Scarface
 
-
-
-[Couplet 2]
 
 Tu t'prends pour le meilleur, tu crois qu'personne ne t'égale
 
@@ -97,9 +87,6 @@ J'suis comme la Bête, j'rêve toujours de m'faire la Belle
 J'ai rien à perdre baby j'taffe qu'avec mes frères
 
 
-
-[Refrain]
-
 Quarante kilos qui m'attendent vers le port d'Anvers
 
 J'ai des tas de billets bleus à repeindre en vert
@@ -119,18 +106,12 @@ J'suis du ghetto, m'faut des espèces, j'suis un raclo d'la pire espèce
 D'après l'Etat j'suis space, il m'faut d'l'oseille comme dans Scarface
 
 
-
-[Pont]
-
 Faut pas mélanger la beuh avec le vrai [?]
 
 Mister Yougataga [?]
 
 Les boycotteurs j'les [?] j'rape par gourmandise
 
-
-
-[Refrain]
 
 Quarante kilos qui m'attendent vers le port d'Anvers
 

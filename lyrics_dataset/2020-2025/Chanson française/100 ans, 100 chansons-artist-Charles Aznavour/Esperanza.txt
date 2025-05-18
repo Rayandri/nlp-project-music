@@ -1,4 +1,5 @@
-{Refrain:}
+
+}
 Esperanza, Esperanza
 Le bonheur en nos c?urs suit son cours
 Esperanza, Esperanza
@@ -32,9 +33,6 @@ Qu'importe c'est la vie
 
 Je ne connais en tout que ce cri
 
-{au Refrain}
-
-
 
 Cesse chérie de te tourmenter
 
@@ -62,4 +60,3 @@ Ne sachant si demain peux donner du nouveau
 
 J'ai confié mon destin à ce mot
 
-{au Refrain}

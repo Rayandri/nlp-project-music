@@ -1,4 +1,3 @@
-[Refrain] x2 :
 Viens voir les comédiens
 Voir les musiciens
 Voir les magiciens
@@ -25,11 +24,6 @@ Et derrière eux comme un cortège en folie
 Ils drainent tout le pays, les comédiens
 
 
-
-[Refrain] x2
-
-
-
 Si vous voulez voir confondus les coquins
 
 Dans une histoire un peu triste
@@ -51,11 +45,6 @@ Quand les trois coups retentiront dans la nuit
 Ils vont renaître à la vie, les comédiens
 
 
-
-[Refrain] x2
-
-
-
 Les comédiens ont démonté leurs tréteaux
 
 Ils ont ôté leur estrade
@@ -72,10 +61,6 @@ Demain matin quand le soleil va se lever
 
 Ils seront loin, et nous croirons avoir rêvé
 
-Mais pour l'instant ils traversent dans la nuit
 
 D'autres villages endormis, les comédiens
 
-
-
-[Refrain] x2

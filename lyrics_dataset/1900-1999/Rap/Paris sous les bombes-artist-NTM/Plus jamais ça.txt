@@ -1,4 +1,5 @@
-REFRAIN: (x4) 
+
+ (x4) 
 Mais on est tous las de ce retour au même schéma 
 Ah non, non, plus jamais ça, seulement voila là 
 Il semblerait que des cas d'amnésie caractérisée soient relevés, 
@@ -45,11 +46,6 @@ Car on est tous las de ce retour au même schéma
 Auquel on avait déjà répondu: plus jamais ça! 
 
 
-
-REFRAIN 
-
-
-
 Ah non cette fois non, pas question, ils n'auront, non, pas de pardon, non, 
 
 Ni d'indulgence, non, quand ma faction passe à l'action 
@@ -87,11 +83,6 @@ Assurée par les nouveaux butors... ah ah
 [viens enculé... pang pang pang] 
 
 
-
-REFRAIN 
-
-
-
 Les honneurs, la patrie, les conquêtes et les colonies, 
 
 On a déjà vu le résultat de ces conneries 
@@ -124,6 +115,3 @@ C'est qu'on aura droit à ce même climat
 
 À ce même climat, à ce même climat 
 
-
-
-REFRAIN

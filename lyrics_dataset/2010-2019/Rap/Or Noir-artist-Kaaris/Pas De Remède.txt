@@ -1,4 +1,3 @@
-[Couplet 1]
 Elle est belle chaque matin
 Pourtant elle fait le tapin
 Ce monde est malsain
@@ -32,9 +31,6 @@ Rajoute quelques grammes que je plane comme Aladdin
 C'est mon psychodrame car le temps est assasin
 
 
-
-[Refrain]:
-
 Je ne veux pas que l'on m'aide (Non)
 
 Je ne veux pas que l'on m'aide (Non)
@@ -67,9 +63,6 @@ Clic Clac t'es dead
 
 Je ne veux pas que l'on m'aide
 
-
-
-[Couplet 2]
 
 Tu m'as vu dans les gradins
 
@@ -114,11 +107,6 @@ Pour eux je rappe comme un martien, ça craint
 Issu du sud sub-saharien
 
 Je t'allume si tu me sers a rien
-
-
-
-[Refrain]
-
 
 
 (Merci à Julien Degand pour cettes paroles)

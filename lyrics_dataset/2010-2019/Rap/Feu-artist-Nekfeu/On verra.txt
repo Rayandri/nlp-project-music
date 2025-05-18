@@ -1,4 +1,3 @@
-[Couplet 1]
 On sèche les cours, la flemme marque le quotidien
 Être en couple, ça fait mal que quand t'y tiens
 Même si j'ai rien à prouver, j'me sens un peu seul
@@ -12,9 +11,6 @@ Je viens à peine de naitre, demain j'serai vieux
 Mais j'vais tout faire pour être à jamais ce rêveur
 
 
-
-[Refrain]
-
 On verra bien c'que l'avenir nous réservera
 
 On verra bien, vas-y, viens, on n'y pense pas
@@ -23,9 +19,6 @@ On verra bien c'que l'avenir nous réservera
 
 On verra bien, on verra bien
 
-
-
-[Couplet 2]
 
 Ce soir, on ira faire un tour chez l'épicier ouvert en bas
 
@@ -49,13 +42,8 @@ Le temps ça file, on a peur d'enchaîner les défaites et puis rater
 
 Sa vie, pas de projets à part mater des DVD piratés
 
-
-
 Ah... On verra bien...
 
-
-
-[Couplet 3]
 
 Ce monde rend fou, tout le monde est en guerre
 
@@ -74,12 +62,6 @@ On s'fait chier au taff, on attend les cances-va
 On s'parle derrière un ordi mais, en vrai, quand est-ce qu'on s'voit ?
 
 
-
-[Refrain]
-
-
-
-[Couplet 4]
 
 Ici, non seulement ça rappe
 
@@ -104,16 +86,10 @@ Pendant qu'ses copains révisaient, le petit Ken devenait écrivain
 Oui, je pense qu'à m'amuser mais pour la coke j'ai le nez de Krilin
 
 
-
-[Pont]
-
 S-Crew, 1.9.9.5, on en a rien à foutre de rien
 
 Blackbird, L'Entourage, on en a rien à foutre de rien
 
-
-
-[Couplet 5]
 
 Nos corps fonctionnent à l'envers, on marche avec des têtes
 
@@ -124,8 +100,6 @@ Moi, je parle avec les mains, parfois j'pense avec ma...
 Mais je touche avec mes pensées et j'écris avec le cur
 
 J'en ai...
-
-
 
 [Outro] ×6
 

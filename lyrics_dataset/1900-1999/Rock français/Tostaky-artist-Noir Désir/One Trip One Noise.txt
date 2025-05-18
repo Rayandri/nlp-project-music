@@ -6,8 +6,6 @@ one trip
 
 one noise
 
-
-
 circuit
 
 nuit bleue
@@ -16,19 +14,13 @@ specialiste
 
 de l'enjeu
 
-
-
 one trip
 
 one noise
 
-
-
 longue attente avant de s'elancer / one trip
 
 longue vie et tout a recracher / one noise
-
-
 
 carrosse
 
@@ -38,19 +30,13 @@ cendrillon
 
 a jeter
 
-
-
 one trip
 
 one noise
 
-
-
 longue attente avant de s'elancer / one trip
 
 longue vie et tout a recracher / one noise
-
-
 
 he toi
 
@@ -60,13 +46,9 @@ qui sont
 
 ou va moi?
 
-
-
 one trip
 
 one noise
-
-
 
 longue attente avant de s'elancer / one trip
 

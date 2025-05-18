@@ -1,4 +1,3 @@
-[Couplet 1]
 C'soir, les enfers vont s'laisser aller, certains vont s'blesser
 Espérer quelques emplettes juste avant leur décès
 Ce soir, certains vont prier pour qu'il y ait plus de billets
@@ -36,9 +35,6 @@ Ce soir est plein d'entrain, ce soir, t'éclates enfin, 'soir-ce', t'es plein d'
 Ce soir, des parents s'quittent, et y'aura pas d'départ au ski ; nan
 
 
-
-[Refrain]
-
 Ce soir des garros grillent et la vie ne reste pas figée bien longtemps
 
 Y'a-t-il pire martyr que la vie et perdre son temps ? (Ce soir des garros grillent...)
@@ -47,9 +43,6 @@ Ce soir, des garros grillent et la vie ne reste pas figée bien longtemps
 
 Y'a-t-il pire martyr que la vie et perdre son temps ?
 
-
-
-[Couplet 2]
 
 Ce soir est assez froid pour être le prochain scénario d'un far-west
 
@@ -91,9 +84,6 @@ Ce soir, ce soir, je crois qu'j'vais pas sortir, poto, j'vais pas t'mentir
 
 Ce soir, je garde mon fils, l'apprenti Charles-Henry
 
-
-
-[Refrain]
 
 Ce soir des garros grillent et la vie ne reste pas figée bien longtemps
 

@@ -1,5 +1,4 @@
 (4124)
-[Couplet 1]
 Je n'ai aucune peine, j'te nique ta race
 Dans les veines je n'ai que de la glace
 J'veux savoir c'que ça fait de prendre leur place
@@ -23,9 +22,6 @@ J'm'en bats les couilles de qui rend l'âme
 J'trempe mes cookies dans tes larmes
 
 
-
-[Refrain]
-
 Les singes viennent de sortir du zoo
 
 Armés comme à l'époque du Clos
@@ -42,9 +38,6 @@ Armés comme à l'époque du Clos
 
 Les singes viennent de sortir du zoo
 
-
-
-[Couplet 2]
 
 Traqué mais pas domestiqué
 
@@ -74,12 +67,6 @@ J'suis un de ces nègres qui persistent, et les ténèbres s'éclaircissent
 
 
 
-[Refrain]
-
-
-
-[Couplet 3]
-
 Y'a que les ficelles de tes strings qui t'soutiennent
 
 J'te baise et les draps s'en souviennent
@@ -103,11 +90,6 @@ Les Hommes mentent mais pas les chiffres
 Le nom d'un mort tatoué sur la peau
 
 Les singes viennent de sortir du zoo
-
-
-
-[Refrain]
-
 
 
 2.7.Z.E.R.O

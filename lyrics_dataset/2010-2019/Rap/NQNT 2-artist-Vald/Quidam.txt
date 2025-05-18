@@ -1,10 +1,8 @@
-[Refrain]
 Rien à foutre qu'il y ait des quidams qui dorment ici, quidams qui dorment ici
 Quidams qui dorment ici, qu'il y ait des quidams qui dorment ici
 Dis-moi qui est l'cador qui a d'énormes missiles
 Qui a d'énormes missiles, ouais, qui a d'énormes missiles
 
-[Couplet 1]
 
 Gère une fillette en Thaï
 
@@ -31,12 +29,6 @@ J'fais partie de la masse qui ne verra pas d'Genkidama, sans billet
 J'décris la loi :
 
 
-
-[Refrain]
-
-
-
-[Couplet 2]
 
 Faire exploser deux tours, c'est simple comme "Bonjour"
 
@@ -73,24 +65,14 @@ Moi, je rêve d'être président, de m'suicider sur grand écran
 Je n'veux plus faire partie des gens, nan, même les gens n'en ont rien à foutre
 
 
-
-[Refrain]
-
-
-
 [Outro]
 
 Le quidam
 
 Le quidam résiste, mais le quidam n'existe
 
-
-
 [Morceau caché - "Nichon"]
 
-
-
-[Couplet]
 
 La p'tite est vilaine, certains disent même débile
 
@@ -137,8 +119,6 @@ Sache que la mère Nichon a perdu son âme
 Alors qu'un client sonne, et qu'dans une flaque au sol sa vie défile
 
 Elle n'y voit que dalle
-
-
 
 [Outro]
 

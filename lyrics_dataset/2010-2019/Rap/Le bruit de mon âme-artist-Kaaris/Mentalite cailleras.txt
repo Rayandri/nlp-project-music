@@ -8,9 +8,6 @@ Quatre-vingt treize
 Quatre-vingt treize
 
 
-
-[Refrain]
-
 Mentalité cailleras, mentalité cailleras
 
 Mentalité cailleras, mentalité cailleras
@@ -25,9 +22,6 @@ Bandit dans son intégralité (2.7 !)
 
 Mentalité cailleras, mentalité cailleras, cailleras
 
-
-
-[Couplet 1]
 
 J'fume, j'fume, j'fume, j'fume, j'fume
 
@@ -58,12 +52,6 @@ J'te nique ta mère, et je l'assume
 Et j'm'en bats les deux burnes
 
 
-
-[Refrain]
-
-
-
-[Couplet 2]
 
 J'pilote, j'pilote, j'pilote, j'pilote
 
@@ -107,12 +95,6 @@ Ce clébard s'y pique parce qu'il s'y frotte
 
 
 
-[Refrain]
-
-
-
-[Couplet 3]
-
 Gros poisson ne mord pas à l'hameçon
 
 Mon verre réclame de la boisson
@@ -142,8 +124,6 @@ J'vole au dessus des 'tasses, j'atterris dans leur fion
 93, c'est ma région
 
 2-7-0 c'est ma légion
-
-
 
 [Outro]
 

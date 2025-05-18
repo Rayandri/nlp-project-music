@@ -1,10 +1,8 @@
-[Refrain]
 Je remplis l'sac, je remplis l'sac
 J'y mets ton cadavre ou j'y mets l'oseille, mais je remplis l'sac
 Je remplis l'sac, je remplis l'sac
 J'y mets la drogue ou j'y mets les armes, mais je remplis l'sac
 
-[Couplet]
 
 Seule la haine me forge forge
 
@@ -52,6 +50,3 @@ Pendant qu'tu grimpes, la branche que tu sous-estimes c'est celle qui va t'rentr
 
 2.7 Z.E.R BRAVE, K Double A aka Thulsa Doom
 
-
-
-[Refrain]

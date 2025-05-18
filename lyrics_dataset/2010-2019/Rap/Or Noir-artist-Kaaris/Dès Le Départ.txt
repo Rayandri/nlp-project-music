@@ -1,5 +1,4 @@
 [Intro]
-[Refrain]
 J'suis dans la cuisine, tu bouffes c'que j'te prépare
 J'suis dans la cuisine, tu bouffes c'que j'te prépare
 J'suis dans la cuisine, tu bouffes c'que j'te prépare
@@ -18,9 +17,6 @@ J'suis dans la cuisine, tu bouffes c'que j'te prépare
 
 2.0.93 on démarre
 
-
-
-[Couplet 1]
 
 J'suis dans la cuisine, tu bouffes c'que j'te prépare
 
@@ -47,12 +43,6 @@ C'est le Zoo si tu cours pas plus vite que l'guépard
 J'te conseille le 3.5.7 et le kevlar
 
 
-
-[Refrain]
-
-
-
-[Couplet 2]
 
 Dans la street depuis le départ
 
@@ -81,7 +71,5 @@ Y'as que tes hassennet qui peuvent nous guer-lar
 Jusqu'a c'que Dieu nous sépare
 
 Merci à Vreezy pour ces paroles
-
-
 
 (Merci à Vreezy pour cettes paroles)
