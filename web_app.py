@@ -67,4 +67,4 @@ if __name__ == '__main__':
         subprocess.check_call([sys.executable, "-m", "pip", "install", "flask"])
         print("Flask installé avec succès.")
     print("Serveur démarré: http://127.0.0.1:5000")
-    app.run(debug=True) 
+    app.run(debug=True, host="0.0.0.0") 
